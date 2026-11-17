@@ -227,3 +227,44 @@ Production settings enable:
 - **Account emails:** password-reset and verification links are built from `SITE_URL`, never from the request's Host header. Verification tokens are signed, carry the email address and expire after 48 h.
 - **Data scoping:** learners can reach only their own sessions and attempts, and can report only questions they have been shown. Admin Studio requires a superuser.
 - **AI input and output:** learner text is passed to the AI as delimited, truncated data. AI output is never trusted until it passes a schema and deterministic checks. Unvalidated output never touches mastery.
+
+## Production: encelis.uz
+
+The live site runs on a single VPS (Ubuntu, SQLite) as described above:
+
+- **Code:** `/srv/encelis`, owned by the unprivileged `encelis` user.
+- **App server:** Gunicorn runs as systemd unit `encelis` (gthread workers on `/run/encelis/gunicorn.sock`).
+- **Web server:** Nginx site `/etc/nginx/sites-available/encelis`.
+- **TLS:** Let's Encrypt via certbot. A timer renews the certificate automatically.
+- **Backups:** daily at 03:30 to `/srv/encelis/var/backups`, keeping 14 copies (`/etc/cron.d/encelis-backup`).
+- **Firewall:** ufw allows SSH, HTTP/HTTPS, and 3389 for the existing xrdp.
+
+Server files live in `deploy/`:
+
+| File | Purpose |
+|---|---|
+| `setup_server.sh` | One-time server setup |
+| `deploy.sh` | Installs or updates the app; safe to re-run |
+| `encelis.service` | systemd unit |
+| `nginx-encelis.conf` | Nginx site |
+
+`deploy.sh` installs the Nginx site only if it doesn't exist yet, so it never overwrites the HTTPS settings that certbot added.
+
+**To update the live site:**
+
+1. Copy the changed files to `/srv/encelis`. Keep the server's `.env` and `var/`.
+2. Run the deploy script and check the service:
+   ```bash
+   ssh -i ~/.ssh/encelis_deploy root@162.35.44.183 "bash /srv/encelis/deploy/deploy.sh"
+   ```
+   ```bash
+   ssh -i ~/.ssh/encelis_deploy root@162.35.44.183 "systemctl status encelis --no-pager"
+   ```
+
+The `.env` on the server differs from the local one in these values:
+
+| Variable | Server value |
+|---|---|
+| `DJANGO_ALLOWED_HOSTS` | `encelis.uz,www.encelis.uz` |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://encelis.uz,https://www.encelis.uz` |
+| `SITE_URL` | `https://encelis.uz` |

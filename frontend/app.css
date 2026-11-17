@@ -1,7 +1,7 @@
 @import "tailwindcss";
-@source "../../templates";
-@source "../../apps";
-@source "../js";
+@source "../templates";
+@source "../apps";
+@source "../static/js";
 
 /* ---------------------------------------------------------------------------
    encelis — design tokens
