@@ -1,0 +1,38 @@
+{% load ui %}{% with d=block.data %}
+{% if block.kind == "explanation" %}
+<div class="t-explain">{% if d.title %}<h3>{{ d.title }}</h3>{% endif %}{{ d.text|paragraphs }}</div>
+{% elif block.kind == "formula" %}
+<div class="t-formula">
+  {% if d.title %}<p class="eyebrow mb-2" style="color:var(--accent)">{{ d.title }}</p>{% endif %}
+  <p class="pattern">{{ d.pattern }}</p>
+  {% if d.note %}<p class="mt-2 text-sm" style="color:var(--ink-soft)">{{ d.note }}</p>{% endif %}
+</div>
+{% elif block.kind == "example" %}
+<div class="t-examples">
+  {% for ex in d.items %}<div><p class="en">{{ ex.en }}</p>{% if ex.uz %}<p class="uz">{{ ex.uz }}</p>{% endif %}{% if ex.note %}<p class="help mt-1">{{ ex.note }}</p>{% endif %}</div>{% endfor %}
+</div>
+{% elif block.kind == "table" %}
+<div class="overflow-x-auto">
+  {% if d.title %}<p class="eyebrow mb-2">{{ d.title }}</p>{% endif %}
+  <table class="t-table"><thead><tr>{% for h in d.headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for row in d.rows %}<tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>{% endfor %}</tbody></table>
+</div>
+{% elif block.kind == "comparison" %}
+<div>
+  <div class="t-compare">
+    <div class="head">{{ d.left_title }}</div><div class="head">{{ d.right_title }}</div>
+    {% for p in d.pairs %}<div class="en">{{ p.left }}</div><div class="en">{{ p.right }}</div>{% endfor %}
+  </div>
+  {% if d.note %}<p class="help mt-2">{{ d.note }}</p>{% endif %}
+</div>
+{% elif block.kind == "note" %}
+<div class="t-note"><span class="font-semibold">Muhim: </span>{{ d.text }}</div>
+{% elif block.kind == "mistake" %}
+<div>
+  <p class="eyebrow mb-3">Keng tarqalgan xatolar</p>
+  <div class="t-mistakes">
+    {% for m in d.items %}<div class="t-mistake"><span class="wrong">{{ m.wrong }}</span><span class="right">{{ m.right }}</span>{% if m.why %}<span class="why">{{ m.why }}</span>{% endif %}</div>{% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endwith %}

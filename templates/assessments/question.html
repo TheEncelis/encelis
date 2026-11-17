@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Daraja testi · encelis{% endblock %}
+{% block chrome %}{% endblock %}
+{% block tabbar %}{% endblock %}
+{% block content %}
+<section class="shell-narrow fade-in" style="padding-block:22px 80px">
+  <div class="flex items-center gap-4">
+    <span class="eyebrow">Daraja testi</span>
+    <div class="meter flex-1"><span style="width:{{ pct }}%"></span></div>
+    <span class="num text-sm muted">{{ number }}</span>
+  </div>
+  <form method="post" action="{% url 'assessments:answer' %}" class="mt-10">
+    {% csrf_token %}
+    <input type="hidden" name="question" value="{{ question.pk }}">
+    {% include "questions/partials/inputs.html" %}
+    <div class="mt-10 flex items-center justify-between gap-3">
+      <button class="btn btn-quiet" type="submit" name="dont_know" value="1" formnovalidate>Bilmayman</button>
+      <button class="btn btn-dark btn-lg" type="submit">Keyingisi</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}{% load ui %}
+{% block title %}Natija · encelis{% endblock %}
+{% block content %}
+<section class="shell-narrow page">
+  <p class="eyebrow">{{ session.get_kind_display }} · {{ session.get_status_display }}</p>
+  <h1 class="display title-lg mt-2">{% if session.answered == 0 %}Mashg'ulot yakunlandi{% elif accuracy >= 85 %}Juda yaxshi natija{% elif accuracy >= 60 %}Yaxshi ish{% else %}Qiyin bo'ldi — bu normal{% endif %}</h1>
+
+  <div class="mt-8 grid grid-cols-3 gap-4">
+    <div class="stat"><span class="v">{{ session.answered }}</span><span class="k">javob</span></div>
+    <div class="stat"><span class="v">{{ accuracy }}%</span><span class="k">to'g'ri</span></div>
+    <div class="stat"><span class="v">{{ minutes }}</span><span class="k">daqiqa</span></div>
+  </div>
+
+  {% if rows %}
+  <div class="mt-10">
+    <h2 class="title-md mb-3">Mavzular</h2>
+    {% for row in rows %}
+    <div class="row-link">
+      <span class="flex-1 min-w-0 grid gap-1.5">
+        <a class="row-title truncate" href="{% url 'curriculum:topic' row.topic.slug %}">{{ row.topic.title }}</a>
+        {% if row.state %}{% stage_track row.state.stage %}
+        <span class="help">{{ row.state.stage|stage_label }} · {{ row.state.percent }}% o'zlashtirish{% if row.card %} · keyingi takrorlash {{ row.card.due|until }}{% endif %}</span>{% endif %}
+      </span>
+      <span class="num text-sm muted">{{ row.correct }}/{{ row.answered }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if mistakes %}
+  <div class="mt-10">
+    <h2 class="title-md mb-3">Xatolar</h2>
+    <div class="grid gap-3">
+      {% for m in mistakes %}
+      <div class="t-mistake">
+        <span class="help">{{ m.topic.title }}{% if m.error_tag %} · {{ m.get_error_tag_display }}{% endif %}</span>
+        <span class="en" style="color:var(--ink-soft)">{{ m.question.prompt|truncatechars:140 }}</span>
+        <span class="right">{{ m.feedback.corrected|default:m.feedback.expected }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="help mt-3">Bu xatolar keyingi mashg'ulotlarda boshqa savollar orqali qayta tekshiriladi.</p>
+  </div>
+  {% endif %}
+
+  {% if session.xp_earned %}<p class="help mt-8 num">+{{ session.xp_earned }} XP</p>{% endif %}
+  <div class="mt-8 flex flex-wrap gap-3">
+    <a class="btn btn-primary btn-lg" href="{% url 'learning:dashboard' %}">Bosh sahifaga</a>
+    <a class="btn btn-ghost btn-lg" href="{% url 'analytics:progress' %}">Natijalarim</a>
+  </div>
+</section>
+{% endblock %}

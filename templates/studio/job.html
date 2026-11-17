@@ -1,0 +1,8 @@
+{% extends "studio/base.html" %}
+{% block stitle %}AI vazifa{% endblock %}
+{% block studio %}
+<a class="link text-sm" href="{% url 'studio:ai' %}">← AI yordamchi</a>
+<h1 class="display title-lg mt-3">{{ job.get_kind_display }}</h1>
+<p class="muted">{{ job.topic.title }} · {{ job.created_at|date:"d.m.Y H:i" }}</p>
+<div class="mt-6">{% include "studio/partials/job_body.html" %}</div>
+{% endblock %}

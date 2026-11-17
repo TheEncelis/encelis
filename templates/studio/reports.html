@@ -1,0 +1,24 @@
+{% extends "studio/base.html" %}
+{% block stitle %}Xabarlar{% endblock %}
+{% block studio %}
+<h1 class="display title-lg">Savollar haqida xabarlar</h1>
+<div class="mt-4 flex flex-wrap gap-2">
+  <a class="btn btn-sm {% if status == 'active' %}btn-dark{% else %}btn-ghost{% endif %}" href="?status=active">Faol</a>
+  {% for v, l in statuses %}<a class="btn btn-sm {% if status == v %}btn-dark{% else %}btn-ghost{% endif %}" href="?status={{ v }}">{{ l }}</a>{% endfor %}
+</div>
+<div class="panel mt-6 overflow-x-auto">
+  <table class="table">
+    <thead><tr><th>Sana</th><th>Sabab</th><th>Savol</th><th>O'quvchi</th><th>Holat</th></tr></thead>
+    <tbody>{% for r in page %}
+      <tr>
+        <td class="help whitespace-nowrap">{{ r.created_at|date:"d.m.Y H:i" }}</td>
+        <td><a class="link font-semibold" href="{% url 'studio:report' r.pk %}">{{ r.get_reason_display }}</a>{% if r.comment %}<span class="help block">{{ r.comment|truncatechars:80 }}</span>{% endif %}</td>
+        <td class="max-w-[360px]"><span class="en">{{ r.question.prompt|truncatechars:80 }}</span><span class="help block">{{ r.question.topic.title }}</span></td>
+        <td class="help">{{ r.user.email }}</td>
+        <td><span class="chip">{{ r.get_status_display }}</span></td>
+      </tr>
+    {% empty %}<tr><td colspan="5" class="muted">Xabarlar yo'q.</td></tr>{% endfor %}</tbody>
+  </table>
+</div>
+{% include "studio/partials/pager.html" with query="status="|add:status %}
+{% endblock %}

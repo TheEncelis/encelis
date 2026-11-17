@@ -1,0 +1,10 @@
+{% extends "accounts/auth_base.html" %}
+{% block auth %}
+<p class="eyebrow">Bir qadam qoldi</p>
+<h1 class="display title-lg mt-2">Emailingizni tasdiqlang</h1>
+<p class="muted mt-3"><strong>{{ user.email }}</strong> manziliga tasdiqlash havolasini yubordik. Havolani bosgach, o'qishni davom ettirishingiz mumkin.</p>
+<form method="post" action="{% url 'accounts:resend_verification' %}" class="mt-8">
+  {% csrf_token %}<input type="hidden" name="back" value="{% url 'accounts:verify_notice' %}">
+  <button class="btn btn-ghost" type="submit">Xatni qayta yuborish</button>
+</form>
+{% endblock %}

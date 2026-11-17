@@ -1,0 +1,18 @@
+{% extends "accounts/auth_base.html" %}
+{% block title %}Kirish · encelis{% endblock %}
+{% block auth %}
+<p class="eyebrow">Xush kelibsiz</p>
+<h1 class="display title-lg mt-2">Kirish</h1>
+<form method="post" class="mt-8 grid gap-5" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  {% for error in form.non_field_errors %}<div class="flash flash-error">{{ error }}</div>{% endfor %}
+  {% include "partials/field.html" with field=form.identifier %}
+  {% include "partials/field.html" with field=form.password %}
+  <button class="btn btn-primary btn-lg btn-block mt-2" type="submit">Kirish</button>
+</form>
+<div class="mt-6 flex justify-between text-sm">
+  <a class="link" href="{% url 'accounts:password_reset' %}">Parolni unutdingizmi?</a>
+  <a class="link" href="{% url 'accounts:register' %}">Ro'yxatdan o'tish</a>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{
+  "name": "encelis",
+  "private": true,
+  "description": "Frontend build for encelis (Tailwind CSS). HTMX and Alpine are vendored into static/vendor.",
+  "scripts": {
+    "build:css": "tailwindcss -i static/src/app.css -o static/css/app.css --minify",
+    "watch:css": "tailwindcss -i static/src/app.css -o static/css/app.css --watch",
+    "vendor": "node -e \"const f=require('fs');f.copyFileSync('node_modules/htmx.org/dist/htmx.min.js','static/vendor/htmx.min.js');f.copyFileSync('node_modules/alpinejs/dist/cdn.min.js','static/vendor/alpine.min.js');f.copyFileSync('node_modules/sortablejs/Sortable.min.js','static/vendor/sortable.min.js')\""
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.5",
+    "alpinejs": "^3.17.5",
+    "htmx.org": "^2.0.11",
+    "sortablejs": "^1.15.7",
+    "tailwindcss": "^4.3.5"
+  }
+}

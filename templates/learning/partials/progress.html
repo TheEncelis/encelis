@@ -1,0 +1,9 @@
+<div class="flex items-center gap-4">
+  <form method="post" action="{% url 'learning:finish' session.pk %}">{% csrf_token %}
+    <button class="btn btn-quiet !px-2" type="submit" aria-label="Mashg'ulotni tugatish" title="Tugatish">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </form>
+  <div class="meter flex-1" role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"><span style="width:{{ pct }}%"></span></div>
+  <span class="num text-sm muted">{{ done }}/{{ total }}</span>
+</div>

@@ -1,0 +1,130 @@
+{% extends "base.html" %}{% load ui %}
+{% block title %}Bugun · encelis{% endblock %}
+{% block content %}
+<section class="shell page">
+  <p class="eyebrow">Salom, {{ user.display_name }}</p>
+
+  {% if away_days >= 7 %}
+  <p class="flash flash-info mt-4">Siz {{ away_days }} kun dam oldingiz. Bugungi mashg'ulot avval eng muhim, unutilishi mumkin bo'lgan mavzularni tiklaydi — yangi material keyin.</p>
+  {% endif %}
+
+  <div class="mt-4 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+    {# ---- Next recommended activity ---- #}
+    <div class="panel-raised p-6 md:p-8 flex flex-col">
+      {% if open_session %}
+        <p class="eyebrow" style="color:var(--accent)">Tugallanmagan mashg'ulot</p>
+        <h1 class="display title-lg mt-3">{{ open_session.get_kind_display }}ni davom ettiring</h1>
+        <p class="muted mt-2">Qolgan joyingizdan davom etasiz.</p>
+        <form method="post" action="{% url 'learning:start' %}" class="mt-8 flex flex-wrap gap-3">
+          {% csrf_token %}<input type="hidden" name="kind" value="{{ open_session.kind }}"><input type="hidden" name="resume" value="1">
+          <button class="btn btn-primary btn-lg">Davom etish</button>
+        </form>
+      {% else %}
+        <p class="eyebrow" style="color:var(--accent)">Bugungi mashg'ulot · {{ profile.daily_goal_minutes }} daqiqa</p>
+        {% if recommendation %}
+          <h1 class="display title-lg mt-3">
+            {% if recommendation.kind == "new" %}Yangi mavzu: {{ recommendation.topic.title }}
+            {% elif recommendation.kind == "weak" %}Zaif tomon: {{ recommendation.topic.title }}
+            {% else %}{{ recommendation.topic.title }}{% endif %}
+          </h1>
+          <p class="en muted mt-1">{{ recommendation.topic.title_en }} · {{ recommendation.topic.unit.level.code }}</p>
+          {% if recommendation.state %}
+          <div class="mt-5 max-w-sm grid gap-2">
+            {% stage_track recommendation.state.stage %}
+            <p class="help">{{ recommendation.state.stage|stage_label }} bosqichi — {{ recommendation.state.stage|stage_hint|lower }}</p>
+          </div>
+          {% endif %}
+        {% else %}
+          <h1 class="display title-lg mt-3">Hamma narsa joyida</h1>
+        {% endif %}
+        <p class="muted mt-4 text-[0.95rem]">Mashg'ulot tarkibi: {{ composition }}.</p>
+        <form method="post" action="{% url 'learning:start' %}" class="mt-auto pt-8">
+          {% csrf_token %}<input type="hidden" name="kind" value="daily">
+          <button class="btn btn-primary btn-lg w-full sm:w-auto">{% if goal_pct >= 100 %}Yana mashq qilish{% else %}Mashg'ulotni boshlash{% endif %}</button>
+        </form>
+      {% endif %}
+    </div>
+
+    {# ---- Daily goal ---- #}
+    <div class="panel p-6 flex items-center gap-6">
+      <div class="ring" style="--p:{{ goal_pct }}">
+        <div><p class="display text-2xl num">{{ goal_minutes_done }}</p><p class="help">/ {{ profile.daily_goal_minutes }} daq</p></div>
+      </div>
+      <div class="grid gap-3">
+        <div><p class="eyebrow">Kunlik maqsad</p><p class="font-semibold mt-1">{% if goal_pct >= 100 %}Bajarildi{% else %}{{ goal_pct }}% bajarildi{% endif %}</p></div>
+        <div class="text-sm muted num">Bugun: {{ today.answered }} ta javob{% if today.answered %}, {% widthratio today.correct today.answered 100 %}% to'g'ri{% endif %}</div>
+        {% if streak %}<div class="text-sm muted">Izchillik: <span class="num font-semibold" style="color:var(--ink)">{{ streak }}</span> kun</div>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-10 grid gap-10 lg:grid-cols-3">
+    {# ---- Reviews ---- #}
+    <div>
+      <div class="section-head"><h2 class="title-md">Takrorlash</h2><span class="num muted text-sm">{{ due }} ta</span></div>
+      {% if due %}
+        <p class="muted text-[0.95rem]">Bu mavzular unutila boshlagan payt keldi. Har biri turli mashqlar bilan tekshiriladi.</p>
+        <form method="post" action="{% url 'learning:start' %}" class="mt-4">{% csrf_token %}<input type="hidden" name="kind" value="review"><input type="hidden" name="back" value="{% url 'learning:dashboard' %}">
+          <button class="btn btn-ghost">Faqat takrorlash</button></form>
+      {% else %}
+        <p class="muted text-[0.95rem]">Hozircha takrorlash kerak bo'lgan mavzu yo'q.</p>
+      {% endif %}
+    </div>
+
+    {# ---- Weak areas ---- #}
+    <div>
+      <div class="section-head"><h2 class="title-md">Zaif tomonlar</h2>{% if weak %}<span class="num muted text-sm">{{ weak|length }}</span>{% endif %}</div>
+      {% for w in weak %}
+        <a class="row-link" href="{% url 'curriculum:topic' w.topic.slug %}">
+          <span class="level-badge">{{ w.topic.unit.level.code }}</span>
+          <span class="flex-1 min-w-0"><span class="row-title block truncate">{{ w.topic.title }}</span>
+            <span class="help">{% if w.state %}{{ w.state.weak_reason|weak_label }} · {{ w.state.percent }}%{% else %}Asos bo'lgan mavzu{% endif %}</span></span>
+        </a>
+      {% empty %}
+        <p class="muted text-[0.95rem]">Takrorlanuvchi xatolar aniqlanmadi.</p>
+      {% endfor %}
+      {% if weak %}
+      <form method="post" action="{% url 'learning:start' %}" class="mt-4">{% csrf_token %}<input type="hidden" name="kind" value="weakness"><input type="hidden" name="back" value="{% url 'learning:dashboard' %}">
+        <button class="btn btn-ghost">Zaif tomonlar ustida ishlash</button></form>
+      {% endif %}
+    </div>
+
+    {# ---- In progress ---- #}
+    <div>
+      <div class="section-head"><h2 class="title-md">Jarayonda</h2><a class="link text-sm" href="{% url 'curriculum:map' %}">Dastur</a></div>
+      {% for a in active %}
+        <a class="row-link" href="{% url 'curriculum:topic' a.topic.slug %}">
+          <span class="flex-1 min-w-0 grid gap-1.5">
+            <span class="row-title truncate">{{ a.topic.title }}</span>
+            {% stage_track a.state.stage %}
+          </span>
+          <span class="num text-sm muted">{{ a.state.percent }}%</span>
+        </a>
+      {% empty %}
+        <p class="muted text-[0.95rem]">Mashg'ulotni boshlang — mavzular shu yerda ko'rinadi.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# ---- Levels ---- #}
+  <div class="rule mt-12 pt-8">
+    <div class="section-head">
+      <h2 class="title-md">Darajalar bo'yicha</h2>
+      <span class="text-sm muted">Taxminiy daraja: <strong style="color:var(--ink)">{{ profile.cefr }}</strong></span>
+    </div>
+    <div class="grid grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-3 lg:grid-cols-6">
+      {% for level in levels %}
+      <div class="grid gap-2">
+        <div class="flex items-baseline justify-between"><span class="font-semibold">{{ level.code }}</span><span class="help num">{{ level.mastered }}/{{ level.total }}</span></div>
+        <div class="meter meter-stack"><span style="width:{{ level.mastered_pct }}%;z-index:1"></span><span style="width:{{ level.mastered_pct|add:level.started_pct }}%"></span></div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="mt-8 flex flex-wrap items-center gap-3">
+      <form method="post" action="{% url 'learning:start' %}">{% csrf_token %}<input type="hidden" name="kind" value="timed"><input type="hidden" name="back" value="{% url 'learning:dashboard' %}">
+        <button class="btn btn-ghost btn-sm">Tezkor sinov · 10 savol</button></form>
+      <span class="help">O'rganilgan mavzular bo'yicha vaqt cheklangan savollar — avtomatiklikni tekshiradi.</span>
+    </div>
+  </div>
+</section>
+{% endblock %}

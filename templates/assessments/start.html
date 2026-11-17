@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Daraja testi · encelis{% endblock %}
+{% block tabbar %}{% endblock %}
+{% block content %}
+<section class="shell-narrow page fade-in">
+  <p class="eyebrow">1-qadam · Daraja testi</p>
+  <h1 class="display title-xl mt-3">Qayerdan boshlashni aniqlaymiz</h1>
+  <p class="lede mt-5">Savollar javoblaringizga qarab qiyinlashadi yoki osonlashadi. Odatda 8–16 savol, 5–8 daqiqa. Bilmagan savolingizni taxmin qilmang — "Bilmayman" tugmasi natijani aniqroq qiladi.</p>
+  <ul class="mt-8 grid gap-3 text-[0.95rem]">
+    <li class="flex gap-3"><span style="color:var(--accent)">—</span>Natija taxminiy CEFR darajangiz va kuchli/zaif mavzularingizni ko'rsatadi.</li>
+    <li class="flex gap-3"><span style="color:var(--accent)">—</span>Bu yakuniy baho emas: daraja har bir keyingi javobingiz bilan yangilanib boradi.</li>
+    <li class="flex gap-3"><span style="color:var(--accent)">—</span>Bilasiz deb hisoblangan mavzular keyingi kunlarda qisqa takrorlash orqali tekshiriladi.</li>
+  </ul>
+  <div class="mt-10 flex flex-wrap gap-3">
+    <form method="post" action="{% url 'assessments:begin' %}">{% csrf_token %}<button class="btn btn-primary btn-lg" type="submit">{% if active %}Testni davom ettirish{% else %}Testni boshlash{% endif %}</button></form>
+    <form method="post" action="{% url 'assessments:skip' %}">{% csrf_token %}<button class="btn btn-ghost btn-lg" type="submit">Men butunlay yangi boshlayapman</button></form>
+  </div>
+</section>
+{% endblock %}

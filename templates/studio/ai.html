@@ -1,0 +1,44 @@
+{% extends "studio/base.html" %}
+{% block stitle %}AI yordamchi{% endblock %}
+{% block studio %}
+<h1 class="display title-lg">AI yordamchi</h1>
+<p class="muted mt-2 max-w-2xl">AI natijalari hech qachon to'g'ridan-to'g'ri o'quvchiga chiqmaydi: har bir savol sxema, grammatik cheklovlar va mustaqil yechim bilan tekshiriladi, so'ng tasdiqlash uchun navbatga tushadi.</p>
+{% if not ai_enabled %}<p class="flash flash-error mt-4">DeepSeek API kaliti sozlanmagan — AI funksiyalari o'chirilgan.</p>{% endif %}
+
+<div class="mt-8 grid gap-8 xl:grid-cols-2">
+  <form method="post" class="panel grid content-start gap-4 p-6">
+    {% csrf_token %}<input type="hidden" name="action" value="questions">
+    <h2 class="title-md">Savollar yaratish</h2>
+    {% include "partials/field.html" with field=form.topic %}
+    <div class="grid grid-cols-3 gap-3">
+      {% include "partials/field.html" with field=form.type %}
+      {% include "partials/field.html" with field=form.count %}
+      {% include "partials/field.html" with field=form.difficulty %}
+    </div>
+    <div><button class="btn btn-primary" {% if not ai_enabled %}disabled{% endif %}>Yaratish</button></div>
+  </form>
+  <form method="post" class="panel grid content-start gap-4 p-6">
+    {% csrf_token %}
+    <h2 class="title-md">Nazariya</h2>
+    <div class="field"><label class="label" for="theory-topic">Mavzu</label>
+      <select class="select" name="topic" id="theory-topic">{% for t in form.fields.topic.queryset %}<option value="{{ t.pk }}">{{ t.unit.level.code }} · {{ t.title }}</option>{% endfor %}</select></div>
+    <div class="flex flex-wrap gap-2">
+      <button class="btn btn-ghost" name="action" value="theory_draft" {% if not ai_enabled %}disabled{% endif %}>Qoralama yozish</button>
+      <button class="btn btn-ghost" name="action" value="theory_review" {% if not ai_enabled %}disabled{% endif %}>Mavjudini tahlil qilish</button>
+    </div>
+    <p class="help">Qoralama va tahlil chuqur fikrlovchi model bilan bajariladi va bir-ikki daqiqa olishi mumkin.</p>
+  </form>
+</div>
+
+<h2 class="title-md mt-10 mb-3">So'nggi vazifalar</h2>
+<div class="panel overflow-x-auto">
+  <table class="table">
+    <thead><tr><th>Vaqt</th><th>Vazifa</th><th>Mavzu</th><th>Holat</th><th>Natija</th></tr></thead>
+    <tbody>{% for job in jobs %}
+      <tr><td class="help whitespace-nowrap">{{ job.created_at|date:"d.m H:i" }}</td><td><a class="link" href="{% url 'studio:job' job.pk %}">{{ job.get_kind_display }}</a>{% if job.params.type %}<span class="help"> · {{ job.params.type }} × {{ job.params.count }}</span>{% endif %}</td>
+        <td>{{ job.topic.title }}</td><td><span class="chip {% if job.status == 'done' %}chip-good{% elif job.status == 'failed' %}chip-bad{% endif %}">{{ job.get_status_display }}</span></td>
+        <td class="help">{% if job.result.saved is not None %}{{ job.result.saved }} saqlandi · {{ job.result.rejected|length }} rad{% elif job.error %}{{ job.error|truncatechars:60 }}{% endif %}</td></tr>
+    {% empty %}<tr><td colspan="5" class="muted">Hali vazifa yo'q.</td></tr>{% endfor %}</tbody>
+  </table>
+</div>
+{% endblock %}

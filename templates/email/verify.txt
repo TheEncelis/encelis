@@ -1,0 +1,8 @@
+Assalomu alaykum, {{ name }}!
+
+Email manzilingizni tasdiqlash uchun ushbu havolani oching:
+{{ url }}
+
+Havola 48 soat amal qiladi. Agar siz ro'yxatdan o'tmagan bo'lsangiz, bu xatni e'tiborsiz qoldiring.
+
+— encelis

@@ -1,0 +1,13 @@
+{% extends "accounts/auth_base.html" %}
+{% block auth %}
+{% if ok %}
+<p class="eyebrow" style="color:var(--good)">Tasdiqlandi</p>
+<h1 class="display title-lg mt-2">Email manzilingiz tasdiqlandi</h1>
+<a class="btn btn-primary mt-8" href="/">Davom etish</a>
+{% else %}
+<p class="eyebrow" style="color:var(--bad)">Havola yaroqsiz</p>
+<h1 class="display title-lg mt-2">Havola eskirgan yoki noto'g'ri</h1>
+<p class="muted mt-3">Sozlamalar sahifasidan yangi tasdiqlash xatini so'rashingiz mumkin.</p>
+<a class="btn btn-ghost mt-8" href="{% url 'accounts:settings' %}">Sozlamalar</a>
+{% endif %}
+{% endblock %}

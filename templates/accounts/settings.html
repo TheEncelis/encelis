@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Sozlamalar · encelis{% endblock %}
+{% block content %}
+<section class="shell-narrow page">
+  <p class="eyebrow">Hisob</p>
+  <h1 class="display title-lg mt-2">Sozlamalar</h1>
+
+  {% if not user.email_verified %}
+  <div class="flash flash-info mt-6 flex flex-wrap items-center justify-between gap-3">
+    <span>Email manzilingiz hali tasdiqlanmagan.</span>
+    <form method="post" action="{% url 'accounts:resend_verification' %}">{% csrf_token %}<input type="hidden" name="back" value="{% url 'accounts:settings' %}"><button class="btn btn-ghost btn-sm">Xatni qayta yuborish</button></form>
+  </div>
+  {% endif %}
+
+  <form method="post" class="panel mt-8 p-6 grid gap-5" x-data="themeSwitch('{{ user.theme }}')">
+    {% csrf_token %}<input type="hidden" name="form" value="profile">
+    <h2 class="title-md">O'qish</h2>
+    {% include "partials/field.html" with field=form.first_name %}
+    <fieldset class="field">
+      <legend class="label mb-2">Kunlik maqsad</legend>
+      <div class="grid grid-cols-4 gap-2">
+        {% for value, label in form.daily_goal_minutes.field.choices %}
+        <label class="option justify-center !font-sans !text-[0.95rem]" style="padding:12px 8px">
+          <input type="radio" name="daily_goal_minutes" value="{{ value }}" {% if form.daily_goal_minutes.value|stringformat:"s" == value|stringformat:"s" %}checked{% endif %}>
+          <span class="num font-semibold">{{ value }}</span><span class="muted text-xs">daq</span>
+        </label>
+        {% endfor %}
+      </div>
+      <p class="help">Har kungi mashg'ulot shu vaqtga mos qilib tuziladi: yangi mavzu, takrorlash va zaif tomonlar.</p>
+    </fieldset>
+    <fieldset class="field">
+      <legend class="label mb-2">Mavzu</legend>
+      <div class="grid grid-cols-3 gap-2">
+        {% for value, label in form.theme.field.choices %}
+        <label class="option justify-center !font-sans !text-[0.92rem]" style="padding:12px 8px">
+          <input type="radio" name="theme" value="{{ value }}" @change="set('{{ value }}')" {% if form.theme.value == value %}checked{% endif %}>{{ label }}
+        </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <div><button class="btn btn-dark" type="submit">Saqlash</button></div>
+  </form>
+
+  <form method="post" class="panel mt-6 p-6 grid gap-5">
+    {% csrf_token %}<input type="hidden" name="form" value="password">
+    <h2 class="title-md">Parolni o'zgartirish</h2>
+    {% for field in password_form %}{% include "partials/field.html" with field=field %}{% endfor %}
+    <div><button class="btn btn-ghost" type="submit">Parolni yangilash</button></div>
+  </form>
+
+  <div class="mt-10 flex items-center justify-between">
+    <span class="muted text-sm">{{ user.email }}</span>
+    <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="btn btn-quiet">Chiqish</button></form>
+  </div>
+</section>
+{% endblock %}

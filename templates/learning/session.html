@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ session.get_kind_display }} · encelis{% endblock %}
+{% block chrome %}{% endblock %}
+{% block tabbar %}{% endblock %}
+{% block content %}
+<section class="shell-narrow" style="padding-block:22px 80px">
+  <div id="stage">{% include "learning/partials/item.html" %}</div>
+</section>
+{% endblock %}

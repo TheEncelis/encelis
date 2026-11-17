@@ -1,0 +1,9 @@
+{% if explanation %}
+<div class="mt-1 grid gap-2 rounded-xl p-4 fade-in" style="background:var(--surface)">
+  <p class="text-sm" style="color:var(--ink-soft)">{{ explanation.explanation_uz }}</p>
+  <p class="text-sm"><span class="font-semibold">Qoida:</span> {{ explanation.rule_uz }}</p>
+  <p class="text-sm"><span class="font-semibold">Misol:</span> <span class="en">{{ explanation.example_en }}</span></p>
+</div>
+{% else %}
+<p class="help">Batafsil tushuntirish hozircha mavjud emas. Mavzu nazariyasidagi "Keng tarqalgan xatolar" bo'limini ko'rib chiqing.</p>
+{% endif %}

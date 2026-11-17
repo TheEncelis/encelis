@@ -1,0 +1,24 @@
+{% extends "studio/base.html" %}
+{% block stitle %}O'quvchilar{% endblock %}
+{% block studio %}
+<div class="section-head"><h1 class="display title-lg">O'quvchilar</h1></div>
+<form class="mt-4 flex gap-2 max-w-md"><input class="input" name="q" value="{{ q }}" placeholder="Ism yoki email"><button class="btn btn-ghost">Qidirish</button></form>
+<div class="panel mt-6 overflow-x-auto">
+  <table class="table">
+    <thead><tr><th>O'quvchi</th><th>Daraja</th><th>Javoblar</th><th>Oxirgi faollik</th><th>Ro'yxatdan</th><th></th></tr></thead>
+    <tbody>
+    {% for u in page %}
+      <tr>
+        <td><a class="link font-semibold" href="{% url 'studio:user' u.pk %}">{{ u.display_name }}</a><span class="help block">{{ u.email }}</span></td>
+        <td>{% if u.learner_profile.placement_done %}<span class="level-badge">{{ u.learner_profile.cefr }}</span>{% else %}<span class="help">test kutilmoqda</span>{% endif %}</td>
+        <td class="num">{{ u.answers }}</td>
+        <td class="help">{{ u.last|date:"d.m.Y H:i"|default:"—" }}</td>
+        <td class="help">{{ u.date_joined|date:"d.m.Y" }}</td>
+        <td>{% if not u.is_active %}<span class="chip chip-bad">bloklangan</span>{% endif %}</td>
+      </tr>
+    {% empty %}<tr><td colspan="6" class="muted">O'quvchilar topilmadi.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "studio/partials/pager.html" %}
+{% endblock %}

@@ -1,0 +1,7 @@
+{% if page.has_other_pages %}
+<div class="mt-5 flex items-center gap-3 text-sm">
+  {% if page.has_previous %}<a class="btn btn-ghost btn-sm" href="?page={{ page.previous_page_number }}{% if query %}&{{ query }}{% endif %}{% if q %}&q={{ q|urlencode }}{% endif %}">← Oldingi</a>{% endif %}
+  <span class="muted num">{{ page.number }} / {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a class="btn btn-ghost btn-sm" href="?page={{ page.next_page_number }}{% if query %}&{{ query }}{% endif %}{% if q %}&q={{ q|urlencode }}{% endif %}">Keyingi →</a>{% endif %}
+</div>
+{% endif %}

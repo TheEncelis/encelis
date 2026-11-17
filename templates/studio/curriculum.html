@@ -1,0 +1,61 @@
+{% extends "studio/base.html" %}
+{% block stitle %}Dastur{% endblock %}
+{% block studio %}
+<div class="section-head"><h1 class="display title-lg">Dastur va nazariya</h1><a class="btn btn-dark btn-sm" href="{% url 'studio:topic_new' %}">Yangi mavzu</a></div>
+<p class="muted max-w-2xl">Daraja → Bo'lim → Mavzu. Mavzu o'quvchilarga faqat u va uning bo'limi e'lon qilinganda ko'rinadi. Tartibni o'zgartirish uchun qatorni <span class="inline-flex align-middle">{% include "studio/partials/drag_handle.html" %}</span> tutqichidan sudrang — mavzuni boshqa bo'limga ham o'tkazish mumkin.</p>
+{% url 'studio:reorder' as reorder_url %}
+
+<div class="mt-8 grid gap-12">
+{% for node in tree %}
+  <section>
+    <div class="level-head">
+      <h2 class="title-md"><span style="color:var(--accent)">{{ node.level.code }}</span> · {{ node.level.title }}</h2>
+      <a class="btn btn-quiet btn-sm" href="{% url 'studio:unit_new' %}?level={{ node.level.pk }}">+ Bo'lim</a>
+    </div>
+
+    <div class="grid gap-6" data-sortable data-kind="unit" data-parent="{{ node.level.pk }}" data-group="units-{{ node.level.pk }}" data-url="{{ reorder_url }}">
+    {% for u in node.units %}
+      <div class="unit-block" data-id="{{ u.unit.pk }}">
+        <div class="unit-head">
+          {% include "studio/partials/drag_handle.html" with label="Bo'limni ko'chirish" %}
+          <a class="unit-title" href="{% url 'studio:unit_edit' u.unit.pk %}">{{ u.unit.title }}</a>
+          {% if not u.unit.is_published %}<span class="chip chip-warn">yashirin</span>{% endif %}
+          <span class="help num">{{ u.topics|length }} mavzu</span>
+          <div class="ml-auto flex items-center gap-1">
+            <form method="post" action="{% url 'studio:unit_toggle' u.unit.pk %}">{% csrf_token %}<button class="btn btn-quiet btn-sm">{% if u.unit.is_published %}Yashirish{% else %}E'lon qilish{% endif %}</button></form>
+            <a class="btn btn-quiet btn-sm" href="{% url 'studio:topic_new' %}?unit={{ u.unit.pk }}">+ Mavzu</a>
+          </div>
+        </div>
+
+        <div class="srow-head" aria-hidden="true"><span></span><span>Mavzu</span><span>Nazariya</span><span>Savollar</span><span>Holat</span><span></span></div>
+        <div class="srows" data-sortable data-kind="topic" data-parent="{{ u.unit.pk }}" data-group="topics" data-url="{{ reorder_url }}">
+          {% for t in u.topics %}
+          <div class="srow" data-id="{{ t.pk }}">
+            {% include "studio/partials/drag_handle.html" with label="Mavzuni ko'chirish" %}
+            <div class="min-w-0">
+              <a class="srow-title" href="{% url 'studio:topic_theory' t.pk %}">{{ t.title }}</a>
+              <span class="srow-sub en">{{ t.title_en }}</span>
+            </div>
+            <span class="srow-cell num">{{ t.n_blocks }} blok</span>
+            <span class="srow-cell num"><a class="link" href="{% url 'studio:questions' %}?topic={{ t.pk }}">{{ t.q_live }} savol</a>{% if t.q_pending %} <span class="chip chip-warn">+{{ t.q_pending }}</span>{% endif %}</span>
+            <span class="srow-cell">{% if t.status == "published" %}<span class="chip chip-good">e'lon qilingan</span>{% elif t.status == "draft" %}<span class="chip">qoralama</span>{% else %}<span class="chip chip-bad">o'chirilgan</span>{% endif %}</span>
+            <div class="srow-actions">
+              <form method="post" action="{% url 'studio:topic_status' t.pk %}">{% csrf_token %}
+                {% if t.status == "published" %}<input type="hidden" name="status" value="inactive"><button class="btn btn-quiet btn-sm">O'chirish</button>
+                {% else %}<input type="hidden" name="status" value="published"><button class="btn btn-ghost btn-sm">E'lon qilish</button>{% endif %}
+              </form>
+              <a class="btn btn-quiet btn-sm" href="{% url 'studio:topic_edit' t.pk %}">Sozlash</a>
+            </div>
+          </div>
+          {% endfor %}
+          <p class="srows-empty">Mavzularni shu yerga sudrab olib keling yoki yangi mavzu qo'shing.</p>
+        </div>
+      </div>
+    {% empty %}
+      <p class="muted text-sm">Bo'limlar yo'q.</p>
+    {% endfor %}
+    </div>
+  </section>
+{% endfor %}
+</div>
+{% endblock %}

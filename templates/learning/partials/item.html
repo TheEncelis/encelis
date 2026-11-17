@@ -1,0 +1,48 @@
+{% load ui %}<div class="fade-in">
+{% include "learning/partials/progress.html" %}
+
+{% if item.kind == "theory" %}
+  <article class="mt-8">
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="level-badge">{{ item.topic.unit.level.code }}</span>
+      {% if remedial %}<span class="chip chip-warn">Qayta ko'rib chiqamiz</span>{% else %}<span class="chip">Yangi mavzu</span>{% endif %}
+    </div>
+    <h1 class="display title-lg mt-4">{{ item.topic.title }}</h1>
+    <p class="en muted mt-1 text-lg">{{ item.topic.title_en }}</p>
+    {% if remedial %}<p class="flash flash-info mt-5">Oxirgi javoblar bu mavzu hali to'liq tushunilmaganini ko'rsatdi. Asosiy qoidalarni yana bir bor ko'rib chiqing — keyin oson savollardan qayta boshlaymiz.</p>{% endif %}
+    {% if objectives %}
+    <div class="panel mt-6 p-5">
+      <p class="eyebrow mb-3">Bu mavzuda siz</p>
+      <ul class="grid gap-2 text-[0.95rem]">{% for o in objectives %}<li class="flex gap-3"><span style="color:var(--accent)">—</span>{{ o.text }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    <div class="mt-8">{% include "curriculum/partials/blocks.html" %}</div>
+    <form class="mt-10" hx-post="{% url 'learning:theory_done' session.pk item.pk %}" hx-target="#stage" hx-swap="innerHTML">
+      {% csrf_token %}
+      <button class="btn btn-primary btn-lg btn-block md:w-auto" type="submit" data-focus>Tushundim — mashqqa o'tish</button>
+    </form>
+  </article>
+
+{% else %}
+  <div class="mt-8" {% if timed %}x-data="countdown({{ question.expected_seconds }})"{% else %}x-data="stopwatch"{% endif %}>
+    {% if timed %}<div class="timer mb-6" aria-hidden="true"><span :style="`transform:scaleX(${ratio})`"></span></div>{% endif %}
+    <div class="flex flex-wrap items-center gap-2 mb-6">
+      <span class="level-badge">{{ item.topic.unit.level.code }}</span>
+      <span class="chip">{{ item.topic.title }}</span>
+      {% if item.purpose == "review" %}<span class="chip chip-accent">Takrorlash</span>{% elif item.purpose == "remedial" %}<span class="chip chip-warn">Xato ustida ishlash</span>{% elif item.purpose == "weakness" %}<span class="chip chip-bad">Zaif tomon</span>{% elif item.purpose == "challenge" %}<span class="chip chip-accent">Tezkor</span>{% endif %}
+    </div>
+    <form hx-post="{% url 'learning:answer' session.pk item.pk %}" hx-target="#stage" hx-swap="innerHTML"
+          {% if not timed %}@submit="$el.querySelector('[name=elapsed_ms]').value = elapsed()"{% endif %}>
+      {% csrf_token %}
+      <input type="hidden" name="elapsed_ms" value="0">
+      {% include "questions/partials/inputs.html" %}
+      <div class="mt-8 flex items-center justify-between gap-3">
+        <span class="help hidden md:inline">{% if question.type == "mcq" %}1–{{ question.payload.options|length }} tugmalari · {% endif %}Enter — tekshirish</span>
+        <button class="btn btn-dark btn-lg btn-submit ml-auto" type="submit">Tekshirish
+          <svg class="when-loading animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
+        </button>
+      </div>
+    </form>
+  </div>
+{% endif %}
+</div>

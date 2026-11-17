@@ -1,0 +1,14 @@
+{% extends "studio/base.html" %}
+{% block stitle %}Bo'lim{% endblock %}
+{% block studio %}
+<a class="link text-sm" href="{% url 'studio:curriculum' %}">← Dastur</a>
+<h1 class="display title-lg mt-3">{% if unit %}{{ unit.title }}{% else %}Yangi bo'lim{% endif %}</h1>
+<form method="post" class="panel mt-6 grid max-w-xl gap-5 p-6">
+  {% csrf_token %}
+  {% for field in form %}
+    {% if field.name == "is_published" %}<label class="flex items-center gap-3"><input type="checkbox" name="is_published" {% if field.value %}checked{% endif %} style="accent-color:var(--accent)"> {{ field.label }}</label>
+    {% else %}{% include "partials/field.html" %}{% endif %}
+  {% endfor %}
+  <div><button class="btn btn-dark">Saqlash</button></div>
+</form>
+{% endblock %}

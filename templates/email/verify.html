@@ -1,0 +1,6 @@
+{% extends "email/base.html" %}{% block body %}
+<p>Assalomu alaykum, {{ name }}!</p>
+<p>encelis'da ro'yxatdan o'tganingiz uchun rahmat. Email manzilingizni tasdiqlash uchun quyidagi tugmani bosing:</p>
+<p style="margin:24px 0"><a href="{{ url }}" style="background:#b05a3c;color:#fff8f1;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:600">Emailni tasdiqlash</a></p>
+<p style="color:#7d6c5d;font-size:13px">Havola 48 soat amal qiladi. Agar siz ro'yxatdan o'tmagan bo'lsangiz, bu xatni e'tiborsiz qoldiring.</p>
+{% endblock %}

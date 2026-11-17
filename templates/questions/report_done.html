@@ -1,0 +1,8 @@
+{% if ok %}
+<h2 class="title-md">Rahmat!</h2>
+<p class="muted mt-2">Xabaringiz qabul qilindi. Savol ko'rib chiqiladi va kerak bo'lsa tuzatiladi.</p>
+{% else %}
+<h2 class="title-md">Xabar yuborilmadi</h2>
+<p class="muted mt-2">Faqat o'zingizga ko'rsatilgan savollar haqida xabar berish mumkin.</p>
+{% endif %}
+<div class="mt-5 flex justify-end"><button type="button" class="btn btn-dark" @click="open=false">Yopish</button></div>

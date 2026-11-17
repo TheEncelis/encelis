@@ -1,0 +1,32 @@
+{% extends "studio/base.html" %}
+{% block stitle %}Savollar{% endblock %}
+{% block studio %}
+<div class="section-head"><h1 class="display title-lg">Savollar</h1><a class="btn btn-dark btn-sm" href="{% url 'studio:question_new' %}{% if f.topic %}?topic={{ f.topic }}{% endif %}">Yangi savol</a></div>
+<form class="filters mt-4">
+  <input class="input" name="q" value="{{ f.q }}" placeholder="Matn bo'yicha qidirish">
+  <select class="select" name="topic"><option value="">Barcha mavzular</option>{% for t in topics %}<option value="{{ t.pk }}" {% if f.topic == t.pk|stringformat:"s" %}selected{% endif %}>{{ t.unit.level.code }} · {{ t.title }}</option>{% endfor %}</select>
+  <select class="select" name="type"><option value="">Barcha turlar</option>{% for v, l in types %}<option value="{{ v }}" {% if f.type == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <select class="select" name="status"><option value="">Barcha holatlar</option>{% for v, l in statuses %}<option value="{{ v }}" {% if f.status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <select class="select" name="source"><option value="">Barcha manbalar</option>{% for v, l in sources %}<option value="{{ v }}" {% if f.source == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <button class="btn btn-ghost">Filtrlash</button>
+  <label class="flex items-center gap-2 text-sm col-span-full mt-1"><input type="checkbox" name="personal" value="1" {% if f.personal == "1" %}checked{% endif %} style="accent-color:var(--accent)"> Shaxsiy (o'quvchi uchun yaratilgan) savollarni ham ko'rsatish</label>
+</form>
+
+<form method="post" action="{% url 'studio:questions_bulk' %}" class="mt-6" x-data="{ picked: 0 }" @change="picked = $el.querySelectorAll('input[name=ids]:checked').length">
+  {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+  <div class="mb-3 flex items-center gap-2" x-show="picked" x-cloak>
+    <span class="text-sm muted"><span x-text="picked"></span> ta tanlandi</span>
+    <button class="btn btn-ghost btn-sm" name="status" value="approved">Tasdiqlash</button>
+    <button class="btn btn-ghost btn-sm" name="status" value="rejected">Rad etish</button>
+    <button class="btn btn-ghost btn-sm" name="status" value="inactive">O'chirish</button>
+  </div>
+  <div class="panel overflow-x-auto">
+    <table class="table table-fixed min-w-[860px]">
+      <colgroup><col style="width:48px"><col><col style="width:150px"><col style="width:76px"><col style="width:110px"><col style="width:140px"><col style="width:190px"></colgroup>
+      <thead><tr><th></th><th>Savol</th><th>Tur</th><th title="Qiyinlik">Qiyinlik</th><th>Natija</th><th>Holat</th><th></th></tr></thead>
+      <tbody>{% for q in page %}{% include "studio/partials/question_row.html" %}{% empty %}<tr><td colspan="7" class="muted">Savollar topilmadi.</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+</form>
+{% include "studio/partials/pager.html" %}
+{% endblock %}

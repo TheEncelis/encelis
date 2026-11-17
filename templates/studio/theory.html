@@ -1,0 +1,46 @@
+{% extends "studio/base.html" %}
+{% block stitle %}{{ topic.title }}{% endblock %}
+{% block studio %}
+<a class="link text-sm" href="{% url 'studio:curriculum' %}">← Dastur</a>
+<div class="mt-3 flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <div class="flex items-center gap-2"><span class="level-badge">{{ topic.unit.level.code }}</span><span class="help">{{ topic.unit.title }}</span>
+      {% if topic.status == "published" %}<span class="chip chip-good">e'lon qilingan</span>{% elif topic.status == "draft" %}<span class="chip">qoralama</span>{% else %}<span class="chip chip-bad">o'chirilgan</span>{% endif %}</div>
+    <h1 class="display title-lg mt-2">{{ topic.title }}</h1>
+    <p class="en muted">{{ topic.title_en }}</p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <a class="btn btn-ghost btn-sm" href="{% url 'studio:topic_edit' topic.pk %}">Sozlamalar</a>
+    <a class="btn btn-ghost btn-sm" href="{% url 'studio:questions' %}?topic={{ topic.pk }}">Savollar</a>
+    {% if topic.status == "published" %}<a class="btn btn-ghost btn-sm" href="{% url 'curriculum:topic' topic.slug %}" target="_blank" rel="noopener">O'quvchi ko'rinishi</a>{% endif %}
+  </div>
+</div>
+
+<div class="mt-8 grid gap-8 xl:grid-cols-[1fr_300px]">
+  <div>
+    {% if objectives %}<div class="panel mb-6 p-5"><p class="eyebrow mb-2">O'quv maqsadlari</p><ul class="grid gap-1 text-sm">{% for o in objectives %}<li>— {{ o.text }}</li>{% endfor %}</ul></div>{% endif %}
+    <div id="blocks" class="grid gap-4" data-sortable data-kind="block" data-parent="{{ topic.pk }}" data-url="{% url 'studio:reorder' %}">
+      {% for block in blocks %}{% include "studio/partials/block_view.html" %}{% endfor %}
+      <p class="srows-empty">Hali blok yo'q. O'ng tomondan blok qo'shing yoki AI qoralamasini so'rang.</p>
+    </div>
+    <div id="new-block" class="mt-4"></div>
+  </div>
+  <aside class="grid content-start gap-6">
+    <div class="panel p-5">
+      <p class="eyebrow mb-3">Blok qo'shish</p>
+      <div class="flex flex-wrap gap-2">
+        {% for value, label in kinds %}<button class="btn btn-ghost btn-sm" hx-get="{% url 'studio:block_new' topic.pk %}?kind={{ value }}" hx-target="#new-block" hx-swap="innerHTML">{{ label }}</button>{% endfor %}
+      </div>
+    </div>
+    <div class="panel p-5">
+      <p class="eyebrow mb-3">AI yordamchi</p>
+      <form method="post" action="{% url 'studio:ai' %}" class="grid gap-2">{% csrf_token %}<input type="hidden" name="topic" value="{{ topic.pk }}">
+        <button class="btn btn-ghost btn-sm" name="action" value="theory_draft">Nazariya qoralamasi</button>
+        <button class="btn btn-ghost btn-sm" name="action" value="theory_review" {% if not blocks %}disabled{% endif %}>Mavjud nazariyani tahlil qilish</button>
+      </form>
+      <p class="help mt-2">Qoralama avtomatik qo'llanmaydi — natijani ko'rib chiqib, qo'shasiz.</p>
+      {% for job in drafts %}<a class="mt-2 flex justify-between text-sm" href="{% url 'studio:job' job.pk %}"><span class="link">{{ job.get_kind_display }}</span><span class="help">{{ job.get_status_display }}</span></a>{% endfor %}
+    </div>
+  </aside>
+</div>
+{% endblock %}

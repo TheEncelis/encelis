@@ -1,0 +1,31 @@
+{% extends "studio/base.html" %}
+{% block stitle %}Mavzu{% endblock %}
+{% block studio %}
+<a class="link text-sm" href="{% if topic %}{% url 'studio:topic_theory' topic.pk %}{% else %}{% url 'studio:curriculum' %}{% endif %}">← Orqaga</a>
+<h1 class="display title-lg mt-3">{% if topic %}{{ topic.title }} — sozlamalar{% else %}Yangi mavzu{% endif %}</h1>
+<form method="post" class="mt-6 grid gap-6 xl:grid-cols-2">
+  {% csrf_token %}
+  {% for error in form.non_field_errors %}<div class="flash flash-error xl:col-span-2">{{ error }}</div>{% endfor %}
+  <div class="panel grid content-start gap-5 p-6">
+    <h2 class="title-md">Asosiy</h2>
+    {% include "partials/field.html" with field=form.unit %}
+    {% include "partials/field.html" with field=form.title %}
+    {% include "partials/field.html" with field=form.title_en %}
+    {% include "partials/field.html" with field=form.slug %}
+    {% include "partials/field.html" with field=form.summary %}
+    {% include "partials/field.html" with field=form.objectives_text %}
+  </div>
+  <div class="panel grid content-start gap-5 p-6">
+    <h2 class="title-md">O'rganish mantiqi</h2>
+    <div class="grid grid-cols-2 gap-4">
+      {% include "partials/field.html" with field=form.difficulty_offset %}
+      {% include "partials/field.html" with field=form.mastery_threshold %}
+    </div>
+    {% include "partials/field.html" with field=form.hard_prerequisites %}
+    {% include "partials/field.html" with field=form.soft_prerequisites %}
+    {% include "partials/field.html" with field=form.related %}
+    <p class="help">Majburiy asos mavzular "Qo'llash" bosqichiga yetmaguncha bu mavzu yangi material sifatida taklif qilinmaydi. Aylanma bog'liqliklar rad etiladi. Ctrl/Cmd bilan bir nechtasini tanlang.</p>
+  </div>
+  <div class="xl:col-span-2"><button class="btn btn-dark btn-lg">Saqlash</button></div>
+</form>
+{% endblock %}

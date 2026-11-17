@@ -1,0 +1,46 @@
+{% extends "base.html" %}{% load ui %}
+{% block title %}Dastur · encelis{% endblock %}
+{% block content %}
+<section class="shell page">
+  <p class="eyebrow">Dastur</p>
+  <h1 class="display title-lg mt-2">A1 dan C2 gacha</h1>
+  <p class="muted mt-2 max-w-xl">Har bir mavzu oldingi mavzularga tayanadi. Qulflangan mavzular dastlab zarur mavzular o'zlashtirilgach ochiladi, lekin ularni oldindan ko'rib chiqishingiz mumkin.</p>
+  <div class="mt-6 flex flex-wrap gap-4 text-xs muted">
+    <span class="flex items-center gap-2"><span class="node-dot progress !w-4 !h-4"></span>Jarayonda</span>
+    <span class="flex items-center gap-2"><span class="node-dot done !w-4 !h-4"></span>O'zlashtirilgan</span>
+    <span class="flex items-center gap-2"><span class="node-dot assumed !w-4 !h-4"></span>Tekshirilmoqda</span>
+    <span class="flex items-center gap-2"><span class="node-dot weak !w-4 !h-4"></span>Zaif</span>
+  </div>
+
+  <div class="mt-10 grid gap-12">
+  {% for group in levels %}
+    <div x-data="{ open: {% if group.level.code == current or forloop.first %}true{% else %}false{% endif %} }" class="rule pt-6">
+      <button type="button" class="flex w-full items-center gap-4 text-left" @click="open=!open" :aria-expanded="open">
+        <span class="display text-3xl" style="color:var(--accent)">{{ group.level.code }}</span>
+        <span class="flex-1"><span class="font-semibold block">{{ group.level.title }}</span><span class="help num">{{ group.mastered }} / {{ group.total }} mavzu o'zlashtirilgan</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" :style="open && 'transform:rotate(180deg)'" style="transition:transform .2s"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div x-show="open" x-transition.opacity class="mt-6 grid gap-8 md:grid-cols-2">
+        {% for u in group.units %}
+        <div>
+          <p class="eyebrow mb-2">{{ u.unit.title }}</p>
+          {% for t in u.topics %}
+          <a class="topic-node group" href="{% url 'curriculum:topic' t.topic.slug %}">
+            <span class="node-dot {% if t.state.is_weak %}weak{% elif t.state.assumed %}assumed{% elif t.state.stage == 6 %}done{% elif t.state and t.state.stage > 0 %}progress{% endif %}">
+              {% if t.state.stage == 6 or t.state.assumed %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+              {% elif t.locked %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M9 11V8a3 3 0 0 1 6 0v3"/></svg>{% endif %}
+            </span>
+            <span class="min-w-0"><span class="row-title block truncate group-hover:text-[color:var(--accent)]" {% if t.locked %}style="color:var(--muted)"{% endif %}>{{ t.topic.title }}</span><span class="help en block truncate">{{ t.topic.title_en }}</span></span>
+            <span class="num help">{% if t.state and t.state.stage > 0 %}{{ t.state.percent }}%{% endif %}</span>
+          </a>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% empty %}
+    <p class="muted">Dastur hali e'lon qilinmagan.</p>
+  {% endfor %}
+  </div>
+</section>
+{% endblock %}

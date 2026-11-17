@@ -1,0 +1,25 @@
+{% extends "studio/base.html" %}
+{% block stitle %}Sozlamalar{% endblock %}
+{% block studio %}
+<h1 class="display title-lg">Platforma sozlamalari</h1>
+<form method="post" class="panel mt-6 max-w-2xl p-6">
+  {% csrf_token %}
+  {% for item in items %}
+  <label class="flex items-start gap-4 border-b py-4 last:border-0" style="border-color:var(--line)">
+    <input type="checkbox" name="{{ item.key }}" {% if item.value %}checked{% endif %} class="mt-1 h-4 w-4" style="accent-color:var(--accent)">
+    <span><span class="font-semibold block">{{ item.label }}</span><span class="help">{{ item.help }}</span></span>
+  </label>
+  {% endfor %}
+  <button class="btn btn-dark mt-4">Saqlash</button>
+</form>
+<div class="panel mt-6 max-w-2xl p-6">
+  <h2 class="title-md mb-3">Muhit</h2>
+  <div class="grid gap-2 text-sm">
+    <div class="flex justify-between"><span>DeepSeek API</span><span class="chip {% if env.ai %}chip-good{% else %}chip-bad{% endif %}">{% if env.ai %}ulangan{% else %}sozlanmagan{% endif %}</span></div>
+    <div class="flex justify-between"><span>Resend (email)</span><span class="chip {% if env.email %}chip-good{% else %}chip-warn{% endif %}">{% if env.email %}ulangan{% else %}konsolga yoziladi{% endif %}</span></div>
+    <div class="flex justify-between"><span>Redis / Celery</span><span class="chip {% if env.redis %}chip-good{% else %}chip-warn{% endif %}">{% if env.redis %}ulangan{% else %}fon oqimida bajariladi{% endif %}</span></div>
+    <div class="flex justify-between"><span>Ma'lumotlar bazasi</span><span class="chip">{{ env.db }}</span></div>
+  </div>
+  <p class="help mt-3">Kalitlar va infratuzilma server muhitidagi <span class="code">.env</span> faylida boshqariladi.</p>
+</div>
+{% endblock %}

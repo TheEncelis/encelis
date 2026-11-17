@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Natija · encelis{% endblock %}
+{% block content %}
+<section class="shell-narrow page fade-in">
+  <p class="eyebrow">Daraja testi natijasi</p>
+  {% if session.status == "skipped" %}
+    <h1 class="display title-xl mt-3">A1 dan boshlaymiz</h1>
+    <p class="lede mt-4">Asoslardan boshlaymiz. Agar mavzular siz uchun oson bo'lsa, tizim buni tez sezadi va tezroq oldinga o'tkazadi.</p>
+  {% else %}
+    <div class="mt-4 flex items-end gap-5">
+      <span class="display" style="font-size:clamp(4rem,12vw,6.5rem);line-height:.9;color:var(--accent)">{{ cefr }}</span>
+      <div class="pb-2"><p class="font-semibold">Taxminiy daraja</p><p class="help num">{{ answered }} savoldan {{ correct }} tasi to'g'ri</p></div>
+    </div>
+    <div class="mt-6 max-w-md">
+      <div class="meter"><span style="width:{{ within }}%"></span></div>
+      <p class="help mt-2">{{ cefr }} darajasi ichidagi o'rningiz. Har bir keyingi javob bu bahoni aniqlashtiradi.</p>
+    </div>
+    <div class="mt-10 grid gap-8 md:grid-cols-2">
+      <div>
+        <p class="eyebrow mb-3" style="color:var(--good)">Yaxshi bilasiz</p>
+        {% for t in strong %}<p class="row-link !py-2.5"><span class="level-badge">{{ t.unit.level.code }}</span>{{ t.title }}</p>{% empty %}<p class="muted text-sm">—</p>{% endfor %}
+      </div>
+      <div>
+        <p class="eyebrow mb-3" style="color:var(--bad)">E'tibor kerak</p>
+        {% for t in weak %}<p class="row-link !py-2.5"><span class="level-badge">{{ t.unit.level.code }}</span>{{ t.title }}</p>{% empty %}<p class="muted text-sm">—</p>{% endfor %}
+      </div>
+    </div>
+    {% if credited %}<p class="flash mt-8">{{ credited }} ta oson mavzu sizga ma'lum deb belgilandi. Ular keyingi kunlarda qisqa takrorlash bilan tekshiriladi — xato qilsangiz, qayta o'rgatiladi.</p>{% endif %}
+  {% endif %}
+  {% if recommendation %}
+  <div class="panel mt-8 p-5">
+    <p class="eyebrow">Birinchi mavzu</p>
+    <p class="title-md mt-2">{{ recommendation.topic.title }}</p>
+    <p class="en muted">{{ recommendation.topic.title_en }}</p>
+  </div>
+  {% endif %}
+  <div class="mt-10 flex flex-wrap gap-3">
+    <form method="post" action="{% url 'learning:start' %}">{% csrf_token %}<input type="hidden" name="kind" value="daily"><button class="btn btn-primary btn-lg">Birinchi mashg'ulotni boshlash</button></form>
+    <a class="btn btn-ghost btn-lg" href="{% url 'accounts:settings' %}">Kunlik maqsadni sozlash</a>
+  </div>
+</section>
+{% endblock %}

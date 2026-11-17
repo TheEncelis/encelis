@@ -1,0 +1,50 @@
+{% extends "studio/base.html" %}
+{% block stitle %}Umumiy ko'rinish{% endblock %}
+{% block studio %}
+<h1 class="display title-lg">Umumiy ko'rinish</h1>
+<div class="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
+  <div class="stat"><span class="v">{{ learners_total }}</span><span class="k">o'quvchi · +{{ learners_new_week }} shu hafta</span></div>
+  <div class="stat"><span class="v">{{ learners_active_week }}</span><span class="k">faol · 7 kun</span></div>
+  <div class="stat"><span class="v">{{ answers_week }}</span><span class="k">javob · {{ accuracy_week }}% to'g'ri</span></div>
+  <div class="stat"><span class="v">{{ mastered_total }}</span><span class="k">o'zlashtirilgan mavzu</span></div>
+</div>
+
+<div class="mt-10 grid gap-8 xl:grid-cols-[1.5fr_1fr]">
+  <div class="panel p-6">
+    <div class="section-head"><h2 class="title-md">Javoblar · 14 kun</h2></div>
+    <div class="bars">{% for d in series %}<div class="hit" style="height:{{ d.height }}%" title="{{ d.date|date:'d.m' }}: {{ d.answered }} javob, {{ d.users }} o'quvchi"></div>{% endfor %}</div>
+    <div class="mt-2 flex justify-between help"><span>{{ series.0.date|date:"d.m" }}</span><span>bugun</span></div>
+  </div>
+  <div class="panel p-6">
+    <div class="section-head"><h2 class="title-md">Darajalar taqsimoti</h2></div>
+    {% for d in distribution %}
+    <div class="grid grid-cols-[34px_1fr_30px] items-center gap-3 py-1.5"><span class="font-semibold text-sm">{{ d.code }}</span><div class="meter"><span style="width:{{ d.width }}%"></span></div><span class="num help text-right">{{ d.count }}</span></div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="mt-8 grid gap-8 xl:grid-cols-3">
+  <div class="panel p-6">
+    <div class="section-head"><h2 class="title-md">Kontent</h2></div>
+    <div class="grid gap-2 text-[0.95rem]">
+      <div class="flex justify-between"><span>Faol savollar</span><span class="num font-semibold">{{ questions_live }}</span></div>
+      <a class="flex justify-between" href="{% url 'studio:questions' %}?status=pending"><span class="link">Tasdiq kutmoqda</span><span class="num font-semibold">{{ questions_pending }}</span></a>
+      <a class="flex justify-between" href="{% url 'studio:reports' %}"><span class="link">Ochiq xabarlar</span><span class="num font-semibold">{{ reports_open }}</span></a>
+      <div class="flex justify-between"><span>AI so'rovlar · 7 kun</span><span class="num font-semibold">{{ ai.calls }}{% if ai.failed %} <span style="color:var(--bad)">({{ ai.failed }} xato)</span>{% endif %}</span></div>
+      <div class="flex justify-between"><span>AI tokenlar · 7 kun</span><span class="num font-semibold">{{ ai.tokens }}</span></div>
+    </div>
+  </div>
+  <div class="panel p-6">
+    <div class="section-head"><h2 class="title-md">Eng qiyin mavzular</h2></div>
+    {% for h in hardest %}
+    <a class="flex items-center justify-between py-1.5 text-[0.93rem]" href="{% url 'studio:topic_theory' h.topic_id %}"><span class="link">{{ h.topic__unit__level__code }} · {{ h.topic__title }}</span><span class="num help">{% widthratio h.avg 1 100 %}% · {{ h.weak }} zaif</span></a>
+    {% empty %}<p class="muted text-sm">Ma'lumot yetarli emas.</p>{% endfor %}
+  </div>
+  <div class="panel p-6">
+    <div class="section-head"><h2 class="title-md">Yangi xabarlar</h2><a class="link text-sm" href="{% url 'studio:reports' %}">Barchasi</a></div>
+    {% for r in reports %}
+    <a class="block py-2 text-[0.92rem]" href="{% url 'studio:report' r.pk %}"><span class="link">{{ r.get_reason_display }}</span><span class="help block truncate">{{ r.question.prompt }}</span></a>
+    {% empty %}<p class="muted text-sm">Yangi xabar yo'q.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

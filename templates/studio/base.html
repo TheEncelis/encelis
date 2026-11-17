@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% load ui static %}
+{% block title %}{% block stitle %}Studio{% endblock %} · encelis studio{% endblock %}
+{% block head %}<script defer src="{% static 'vendor/sortable.min.js' %}"></script><script defer src="{% static 'js/studio.js' %}{% if asset_v %}?v={{ asset_v }}{% endif %}"></script>{% endblock %}
+{% block chrome %}
+<header class="topbar">
+  <div class="topbar-inner px-5">
+    <a href="{% url 'studio:dashboard' %}" class="logo" aria-label="encelis studio">{% include "partials/logo_mark.html" %}<span class="logo-word">encelis<span class="logo-tag">studio</span></span></a>
+    <div class="flex items-center gap-2" x-data="{ menu: false }">
+      <button class="btn btn-ghost btn-sm lg:hidden" @click="menu=!menu" :aria-expanded="menu">Menyu</button>
+      <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="btn btn-quiet btn-sm">Chiqish</button></form>
+      <div x-show="menu" x-cloak @click.outside="menu=false" class="panel-raised absolute right-4 top-14 z-40 w-64 p-2 lg:hidden">{% include "studio/partials/nav.html" %}</div>
+    </div>
+  </div>
+</header>
+{% endblock %}
+{% block tabbar %}{% endblock %}
+{% block content %}
+<div class="mx-auto grid max-w-[1320px] gap-8 px-5 py-8 lg:grid-cols-[210px_1fr]">
+  <aside class="studio-side"><div class="sticky top-24">{% include "studio/partials/nav.html" %}</div></aside>
+  <div class="min-w-0">{% block studio %}{% endblock %}</div>
+</div>
+{% endblock %}

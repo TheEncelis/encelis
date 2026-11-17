@@ -1,0 +1,7 @@
+{{ name }}, emailingiz tasdiqlandi.
+
+Har kuni belgilagan vaqtingizda qisqa mashg'ulot qiling — encelis yangi mavzu, takrorlash va zaif tomonlarni o'zi muvozanatlaydi.
+
+{{ site_url }}/dashboard/
+
+— encelis

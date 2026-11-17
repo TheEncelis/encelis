@@ -1,0 +1,41 @@
+{% if block %}{% url 'studio:block_edit' topic.pk block.pk as action %}{% else %}{% url 'studio:block_new' topic.pk as action %}{% endif %}
+<div class="panel-raised p-5 fade-in" {% if block %}id="block-{{ block.pk }}"{% endif %}>
+  <form class="grid gap-4" hx-post="{{ action }}" {% if block %}hx-target="#block-{{ block.pk }}" hx-swap="outerHTML"{% else %}hx-target="#new-block" hx-swap="innerHTML"{% endif %}>
+    {% csrf_token %}<input type="hidden" name="kind" value="{{ kind }}">
+    <p class="title-md">{{ kind_label }}</p>
+    {% for e in errors %}<p class="flash flash-error">{{ e }}</p>{% endfor %}
+
+    {% if kind == "explanation" or kind == "formula" or kind == "table" %}
+    <div class="field"><label class="label">Sarlavha (ixtiyoriy)</label><input class="input" name="title" value="{{ v.title|default:'' }}" maxlength="300"></div>
+    {% endif %}
+
+    {% if kind == "explanation" %}
+    <div class="field"><label class="label">Matn</label><textarea class="textarea" name="text" rows="8">{{ v.text|default:'' }}</textarea><p class="help">Xatboshilarni bo'sh qator bilan ajrating.</p></div>
+    {% elif kind == "note" %}
+    <div class="field"><label class="label">Eslatma</label><textarea class="textarea" name="text" rows="3">{{ v.text|default:'' }}</textarea></div>
+    {% elif kind == "formula" %}
+    <div class="field"><label class="label">Formula</label><input class="input en" name="pattern" value="{{ v.pattern|default:'' }}" placeholder="Subject + have/has + V3"></div>
+    <div class="field"><label class="label">Izoh</label><input class="input" name="note" value="{{ v.note|default:'' }}"></div>
+    {% elif kind == "example" %}
+    <div class="field"><label class="label">Misollar</label><textarea class="textarea en" name="items" rows="6" placeholder="She has finished. || U tugatdi. || izoh (ixtiyoriy)">{{ v.items|default:'' }}</textarea><p class="help">Har qatorda: <span class="code">inglizcha || o'zbekcha || izoh</span></p></div>
+    {% elif kind == "mistake" %}
+    <div class="field"><label class="label">Xatolar</label><textarea class="textarea en" name="items" rows="6" placeholder="He go to school. || He goes to school. || 3-shaxs birlikda -s qo'shiladi.">{{ v.items|default:'' }}</textarea><p class="help">Har qatorda: <span class="code">noto'g'ri || to'g'ri || sababi</span></p></div>
+    {% elif kind == "table" %}
+    <div class="field"><label class="label">Ustunlar</label><input class="input" name="headers" value="{{ v.headers|default:'' }}" placeholder="Shaxs | Fe'l | Misol"></div>
+    <div class="field"><label class="label">Qatorlar</label><textarea class="textarea en" name="rows" rows="6">{{ v.rows|default:'' }}</textarea><p class="help">Har qatorda kataklar <span class="code">|</span> bilan ajratiladi.</p></div>
+    {% elif kind == "comparison" %}
+    <div class="grid grid-cols-2 gap-3">
+      <div class="field"><label class="label">Chap sarlavha</label><input class="input" name="left_title" value="{{ v.left_title|default:'' }}"></div>
+      <div class="field"><label class="label">O'ng sarlavha</label><input class="input" name="right_title" value="{{ v.right_title|default:'' }}"></div>
+    </div>
+    <div class="field"><label class="label">Juftliklar</label><textarea class="textarea en" name="pairs" rows="5">{{ v.pairs|default:'' }}</textarea><p class="help">Har qatorda: <span class="code">chap || o'ng</span></p></div>
+    <div class="field"><label class="label">Izoh</label><input class="input" name="note" value="{{ v.note|default:'' }}"></div>
+    {% endif %}
+
+    <div class="flex gap-2">
+      <button class="btn btn-dark btn-sm" type="submit">Saqlash</button>
+      {% if block %}<button class="btn btn-quiet btn-sm" type="button" hx-get="{% url 'studio:block_edit' topic.pk block.pk %}?view=1" hx-target="#block-{{ block.pk }}" hx-swap="outerHTML">Bekor qilish</button>
+      {% else %}<button class="btn btn-quiet btn-sm" type="button" onclick="document.getElementById('new-block').innerHTML=''">Bekor qilish</button>{% endif %}
+    </div>
+  </form>
+</div>

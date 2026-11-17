@@ -1,0 +1,16 @@
+{% extends "accounts/auth_base.html" %}
+{% block title %}Ro'yxatdan o'tish · encelis{% endblock %}
+{% block auth %}
+<p class="eyebrow">Yangi hisob</p>
+<h1 class="display title-lg mt-2">Boshlaylik</h1>
+<p class="muted mt-2">Hisob yaratganingizdan so'ng qisqa daraja testi o'tkaziladi.</p>
+<form method="post" class="mt-8 grid gap-5" novalidate>
+  {% csrf_token %}
+  {% for error in form.non_field_errors %}<div class="flash flash-error">{{ error }}</div>{% endfor %}
+  {% include "partials/field.html" with field=form.first_name %}
+  {% include "partials/field.html" with field=form.email %}
+  {% include "partials/field.html" with field=form.password %}
+  <button class="btn btn-primary btn-lg btn-block mt-2" type="submit">Hisob yaratish</button>
+</form>
+<p class="muted mt-6 text-sm">Hisobingiz bormi? <a class="link" href="{% url 'accounts:login' %}">Kirish</a></p>
+{% endblock %}

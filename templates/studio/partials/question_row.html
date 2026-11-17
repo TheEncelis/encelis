@@ -1,0 +1,16 @@
+{% load ui %}<tr id="q-{{ q.pk }}">
+  <td><input type="checkbox" name="ids" value="{{ q.pk }}" aria-label="Tanlash"></td>
+  <td class="min-w-0">
+    <a class="link en block truncate" href="{% url 'studio:question_edit' q.pk %}?next={{ request.get_full_path|urlencode }}">{{ q.prompt }}</a>
+    <span class="help block truncate">{{ q.topic.unit.level.code }} · {{ q.topic.title }} · {{ q.get_source_display }}{% if q.personalized_for_id %} · shaxsiy{% endif %}{% if q.open_reports %} · <span style="color:var(--bad)">{{ q.open_reports }} xabar</span>{% endif %}</span>
+  </td>
+  <td class="help truncate">{{ q.get_type_display }}</td>
+  <td class="num">{{ q.difficulty }}</td>
+  <td class="num help whitespace-nowrap">{% if q.times_shown %}{{ q.accuracy|percent }}% · {{ q.times_shown }}{% else %}—{% endif %}</td>
+  <td>{% if q.status == "approved" %}<span class="chip chip-good">{{ q.get_status_display }}</span>{% elif q.status == "pending" %}<span class="chip chip-warn">{{ q.get_status_display }}</span>{% elif q.status == "draft" %}<span class="chip">{{ q.get_status_display }}</span>{% else %}<span class="chip chip-bad">{{ q.get_status_display }}</span>{% endif %}</td>
+  <td class="whitespace-nowrap text-right">
+    {% if q.status != "approved" %}<button type="button" class="btn btn-quiet btn-sm" hx-post="{% url 'studio:question_status' q.pk %}" hx-vals='{"status": "approved"}' hx-target="#q-{{ q.pk }}" hx-swap="outerHTML">Tasdiqlash</button>{% endif %}
+    {% if q.status == "pending" %}<button type="button" class="btn btn-quiet btn-sm" hx-post="{% url 'studio:question_status' q.pk %}" hx-vals='{"status": "rejected"}' hx-target="#q-{{ q.pk }}" hx-swap="outerHTML">Rad etish</button>{% endif %}
+    {% if q.status == "approved" %}<button type="button" class="btn btn-quiet btn-sm" hx-post="{% url 'studio:question_status' q.pk %}" hx-vals='{"status": "inactive"}' hx-target="#q-{{ q.pk }}" hx-swap="outerHTML">O'chirish</button>{% endif %}
+  </td>
+</tr>

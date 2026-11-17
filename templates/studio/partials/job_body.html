@@ -1,0 +1,46 @@
+{% load ui %}<div id="job-body" {% if not job.is_finished %}hx-get="{% url 'studio:job' job.pk %}" hx-trigger="every 3s" hx-swap="outerHTML"{% endif %}>
+{% if not job.is_finished %}
+  <div class="panel flex items-center gap-3 p-6">
+    <svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
+    <span>{{ job.get_status_display }}… Natija tayyor bo'lgach, sahifa o'zi yangilanadi.</span>
+  </div>
+{% elif job.status == "failed" %}
+  <div class="flash flash-error">Vazifa bajarilmadi: {{ job.error }}</div>
+{% elif job.kind == "questions" or job.kind == "personal" %}
+  <div class="grid grid-cols-3 gap-6">
+    <div class="stat"><span class="v">{{ job.result.generated }}</span><span class="k">yaratildi</span></div>
+    <div class="stat"><span class="v">{{ job.result.saved }}</span><span class="k">tekshiruvdan o'tdi</span></div>
+    <div class="stat"><span class="v">{{ job.result.rejected|length }}</span><span class="k">rad etildi</span></div>
+  </div>
+  {% if questions %}
+  <h2 class="title-md mt-8 mb-3">Saqlangan savollar {% if not job.result.auto_approved %}<span class="help">— tasdiqlashni kutmoqda</span>{% endif %}</h2>
+  <form method="post" action="{% url 'studio:questions_bulk' %}">{% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <div class="panel overflow-x-auto"><table class="table"><tbody>{% for q in questions %}{% include "studio/partials/question_row.html" %}{% endfor %}</tbody></table></div>
+  </form>
+  {% endif %}
+  {% if job.result.rejected %}
+  <h2 class="title-md mt-8 mb-3">Rad etilganlar</h2>
+  <div class="grid gap-2">{% for r in job.result.rejected %}<div class="panel p-4 text-sm"><p class="en">{{ r.prompt }}</p><p class="help mt-1">{{ r.reasons|join:"; " }}</p></div>{% endfor %}</div>
+  {% endif %}
+{% elif job.kind == "theory_draft" %}
+  <div class="panel p-5"><p class="eyebrow mb-2">Qisqa tavsif</p><p>{{ job.result.summary }}</p>
+    <p class="eyebrow mt-4 mb-2">O'quv maqsadlari</p><ul class="text-sm grid gap-1">{% for o in job.result.objectives %}<li>— {{ o }}</li>{% endfor %}</ul></div>
+  <div class="mt-6 grid gap-4">{% for block in job.result.blocks %}<div class="panel p-5"><span class="chip mb-3">{{ block.kind }}</span><div class="theory">{% include "curriculum/partials/block.html" %}</div></div>{% endfor %}</div>
+  <form method="post" action="{% url 'studio:theory_apply' job.topic_id job.pk %}" class="mt-6 flex flex-wrap gap-2">{% csrf_token %}
+    <button class="btn btn-primary" name="mode" value="append">Mavjud bloklarga qo'shish</button>
+    <button class="btn btn-ghost" name="mode" value="replace" onclick="return confirm('Mavjud nazariya bloklari o\'chirilib, qoralama bilan almashtirilsinmi?')">Butunlay almashtirish</button>
+  </form>
+{% elif job.kind == "theory_review" %}
+  <div class="panel p-5"><p class="eyebrow mb-2">Umumiy xulosa</p><p>{{ job.result.verdict_uz }}</p></div>
+  <div class="mt-6 grid gap-3">
+    {% for issue in job.result.issues %}
+    <div class="panel p-5">
+      <div class="flex items-center gap-2"><span class="chip {% if issue.severity == 'high' %}chip-bad{% elif issue.severity == 'medium' %}chip-warn{% endif %}">{{ issue.severity }}</span>{% if issue.block is not None %}<span class="help">blok #{{ issue.block|add:1 }}</span>{% endif %}</div>
+      <p class="mt-2">{{ issue.problem_uz }}</p><p class="mt-1 text-sm muted">Tavsiya: {{ issue.suggestion_uz }}</p>
+    </div>
+    {% empty %}<p class="muted">Muhim muammo topilmadi.</p>{% endfor %}
+  </div>
+  <a class="btn btn-ghost mt-6" href="{% url 'studio:topic_theory' job.topic_id %}">Nazariyani tahrirlash</a>
+{% endif %}
+</div>

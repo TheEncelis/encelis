@@ -1,0 +1,77 @@
+{% extends "base.html" %}{% load ui %}
+{% block title %}Natijalar · encelis{% endblock %}
+{% block content %}
+<section class="shell page">
+  <p class="eyebrow">Natijalar</p>
+  <h1 class="display title-lg mt-2">Sizning progressingiz</h1>
+
+  <div class="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
+    <div class="stat"><span class="v">{{ profile.cefr }}</span><span class="k">taxminiy daraja</span></div>
+    <div class="stat"><span class="v">{{ total_minutes }}</span><span class="k">daqiqa · 28 kun</span></div>
+    <div class="stat"><span class="v">{{ streak }}</span><span class="k">kunlik izchillik</span></div>
+    <div class="stat"><span class="v">{{ profile.xp }}</span><span class="k">XP</span></div>
+  </div>
+  <div class="mt-6 max-w-xl">
+    <div class="flex justify-between help mb-1.5"><span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span></div>
+    <div class="meter"><span style="width:{{ ability_pct }}%"></span></div>
+  </div>
+
+  <div class="mt-12 grid gap-10 lg:grid-cols-[1.4fr_1fr]">
+    <div>
+      <div class="section-head"><h2 class="title-md">Faollik</h2><span class="help">So'nggi 28 kun · chiziq — kunlik maqsad</span></div>
+      <div class="relative">
+        <div class="bars" role="img" aria-label="Kunlik faollik diagrammasi">
+          {% for c in chart %}<div class="{% if c.goal_met %}hit{% endif %}" style="height:{{ c.height }}%" title="{{ c.day.date|date:'d.m' }}: {{ c.day.active_seconds|minutes }}"></div>{% endfor %}
+        </div>
+        <div class="absolute inset-x-0 border-t border-dashed" style="bottom:{{ goal_height }}%;border-color:var(--line-strong)"></div>
+      </div>
+    </div>
+    <div>
+      <div class="section-head"><h2 class="title-md">Bosqichlar</h2></div>
+      {% for stage, count in stage_counts %}
+      <div class="flex items-center justify-between py-2 text-[0.95rem] border-b" style="border-color:var(--line)"><span>{{ stage.label }}</span><span class="num font-semibold">{{ count }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="mt-12 grid gap-10 lg:grid-cols-2">
+    <div>
+      <div class="section-head"><h2 class="title-md">Ko'p uchraydigan xatolar</h2></div>
+      {% for m in mistakes %}
+      <div class="grid gap-1.5 py-2"><div class="flex justify-between text-[0.95rem]"><span>{{ m.label }}</span><span class="num muted">{{ m.total }}</span></div><div class="meter"><span style="width:{{ m.width }}%"></span></div></div>
+      {% empty %}<p class="muted text-sm">Hali ma'lumot yetarli emas.</p>{% endfor %}
+    </div>
+    <div>
+      <div class="section-head"><h2 class="title-md">Mashq turlari</h2></div>
+      {% for t in types %}
+      <div class="flex items-center justify-between py-2 border-b text-[0.95rem]" style="border-color:var(--line)"><span>{{ t.label }}</span><span class="num muted">{{ t.acc }}% · {{ t.n }}</span></div>
+      {% empty %}<p class="muted text-sm">Hali ma'lumot yetarli emas.</p>{% endfor %}
+    </div>
+  </div>
+
+  <div class="mt-12">
+    <div class="section-head"><h2 class="title-md">Mavzular</h2><span class="help">{{ topics|length }} ta boshlangan</span></div>
+    <div class="grid gap-x-10 md:grid-cols-2">
+    {% for row in topics %}
+      <a class="row-link" href="{% url 'curriculum:topic' row.topic.slug %}">
+        <span class="level-badge">{{ row.topic.unit.level.code }}</span>
+        <span class="flex-1 min-w-0 grid gap-1.5"><span class="row-title truncate">{{ row.topic.title }}</span>{% stage_track row.state.stage %}</span>
+        <span class="num text-sm muted">{{ row.state.percent }}%</span>
+      </a>
+    {% empty %}<p class="muted text-sm">Hali mavzu boshlanmagan.</p>{% endfor %}
+    </div>
+  </div>
+
+  <div class="mt-12 grid gap-10 lg:grid-cols-2">
+    <div>
+      <div class="section-head"><h2 class="title-md">Keyingi takrorlashlar</h2></div>
+      {% for c in upcoming %}<div class="flex justify-between py-2 text-[0.95rem]"><span>{{ c.topic.title }}</span><span class="muted text-sm">{{ c.due|until }}</span></div>
+      {% empty %}<p class="muted text-sm">Rejalashtirilgan takrorlash yo'q.</p>{% endfor %}
+    </div>
+    <div>
+      <div class="section-head"><h2 class="title-md">Bosqichlar yo'li</h2></div>
+      <div class="flex flex-wrap gap-2">{% for m in milestones %}<span class="chip {% if m.done %}chip-good{% endif %}">{{ m.title }}</span>{% endfor %}</div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% if fresh %}<div hx-swap-oob="beforeend:#blocks">{% endif %}
+<div class="panel p-5{% if fresh %} fade-in{% endif %}" id="block-{{ block.pk }}" data-id="{{ block.pk }}">
+  <div class="mb-4 flex items-center gap-2">
+    {% include "studio/partials/drag_handle.html" with label="Blokni ko'chirish" %}
+    <span class="chip">{{ block.get_kind_display }}</span>
+    <div class="ml-auto flex items-center gap-1">
+      <button class="btn btn-quiet btn-sm" hx-get="{% url 'studio:block_edit' topic.pk block.pk %}" hx-target="#block-{{ block.pk }}" hx-swap="outerHTML">Tahrirlash</button>
+      <button class="btn btn-quiet btn-sm" style="color:var(--bad)" hx-post="{% url 'studio:block_delete' topic.pk block.pk %}" hx-target="#block-{{ block.pk }}" hx-swap="outerHTML" hx-confirm="Blok o'chirilsinmi?">O'chirish</button>
+    </div>
+  </div>
+  <div class="theory">{% include "curriculum/partials/block.html" %}</div>
+</div>
+{% if fresh %}</div>{% endif %}

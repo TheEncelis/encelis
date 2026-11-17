@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}encelis — ingliz tili grammatikasi, A1 dan C2 gacha{% endblock %}
+{% block content %}
+<section class="shell page">
+  <div class="grid gap-14 md:grid-cols-[1.25fr_1fr] md:items-center">
+    <div class="fade-in">
+      <p class="eyebrow mb-5">Ingliz tili grammatikasi · A1 — C2</p>
+      <h1 class="display title-xl hero-title"><span class="hero-line">Qoidani yodlash emas&nbsp;—</span> <span class="hero-line" style="color:var(--accent)">avtomatik&nbsp;qo'llash.</span></h1>
+      <p class="lede mt-6">encelis har bir grammatik tushunchani alohida kuzatadi: nimani bilasiz, nimada adashasiz va nimani qachon takrorlash kerak. Har kungi mashg'ulot shu bilimga qarab tuziladi.</p>
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">Darajamni aniqlash</a>
+        <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-lg">Hisobim bor</a>
+      </div>
+      <p class="help mt-4">Ro'yxatdan o'tgach, 8–16 savollik moslashuvchan test sizning boshlang'ich darajangizni aniqlaydi.</p>
+    </div>
+    <div class="panel-raised p-6 md:p-8 fade-in" aria-hidden="true">
+      <p class="eyebrow">Present Perfect · B1</p>
+      <p class="q-prompt mt-4">I <span class="blank" style="min-width:9ch">have lived</span> here since 2019.</p>
+      <div class="feedback feedback-good mt-6">
+        <p class="verdict">To'g'ri</p>
+        <p class="mt-1 text-sm" style="color:var(--ink-soft)">"since" — o'tmishda boshlanib, hozir ham davom etayotgan holat. Shuning uchun <span class="en">have + V3</span>.</p>
+      </div>
+      <div class="mt-6 grid gap-2">
+        <div class="flex justify-between text-sm"><span class="muted">O'zlashtirish</span><span class="num font-semibold">72%</span></div>
+        <div class="stage-track"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+        <p class="help">Qo'llash bosqichi · keyingi takrorlash 3 kundan so'ng</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule mt-20 pt-12 grid gap-10 md:grid-cols-3">
+    <div>
+      <p class="eyebrow" style="color:var(--accent)">01 · O'rganish sikli</p>
+      <h2 class="title-md mt-3">O'rganish → Tushunish → Mashq → Qo'llash → Mustahkamlash</h2>
+      <p class="muted mt-2 text-[0.95rem]">Keyingi bosqichga faqat bilim isbotlanganda o'tasiz. Qiynalsangiz, tizim nazariyaga qaytaradi.</p>
+    </div>
+    <div>
+      <p class="eyebrow" style="color:var(--accent)">02 · Xatolar ustida ishlash</p>
+      <h2 class="title-md mt-3">Har bir xato toifalanadi</h2>
+      <p class="muted mt-2 text-[0.95rem]">Artikl, zamon, so'z tartibi… Xato sababi o'zbek tilida tushuntiriladi va aynan shu xato bo'yicha yangi mashq beriladi.</p>
+    </div>
+    <div>
+      <p class="eyebrow" style="color:var(--accent)">03 · Uzoq muddatli xotira</p>
+      <h2 class="title-md mt-3">FSRS asosida takrorlash</h2>
+      <p class="muted mt-2 text-[0.95rem]">Har bir mavzu unutilish arafasida, har safar boshqa turdagi mashqlar bilan qaytadi.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

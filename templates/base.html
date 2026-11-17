@@ -1,0 +1,72 @@
+{% load static ui %}<!doctype html>
+<html lang="uz"{% if ui_theme == "light" or ui_theme == "dark" %} data-theme="{{ ui_theme }}"{% endif %}>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#191512" media="(prefers-color-scheme: dark)">
+  <title>{% block title %}encelis{% endblock %}</title>
+  <meta name="description" content="encelis — ingliz tili grammatikasini A1 dan C2 gacha moslashuvchan tarzda o'rganish platformasi.">
+  <link rel="icon" href="{% static 'img/favicon.svg' %}?v=2" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}{% if asset_v %}?v={{ asset_v }}{% endif %}">
+  <script src="{% static 'js/app.js' %}{% if asset_v %}?v={{ asset_v }}{% endif %}"></script>
+  <script defer src="{% static 'vendor/htmx.min.js' %}"></script>
+  <script defer src="{% static 'vendor/alpine.min.js' %}"></script>
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% block chrome %}
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a href="{% url 'core:landing' %}" class="logo" aria-label="encelis — bosh sahifa">{% include "partials/logo_mark.html" %}<span class="logo-word">encelis</span></a>
+      {% if user.is_authenticated and not user.is_staff and not user.profile.placement_done %}
+      <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="btn btn-quiet btn-sm">Chiqish</button></form>
+      {% elif user.is_authenticated and not user.is_staff %}
+      <nav class="navlinks" aria-label="Asosiy">
+        <a class="navlink" href="{% url 'learning:dashboard' %}" {% current '/dashboard/' '/learn/' %}>Bugun</a>
+        <a class="navlink" href="{% url 'curriculum:map' %}" {% current '/curriculum/' %}>Dastur</a>
+        <a class="navlink" href="{% url 'analytics:progress' %}" {% current '/progress/' %}>Natijalar</a>
+        <a class="navlink" href="{% url 'accounts:settings' %}" {% current '/settings/' %}>Sozlamalar</a>
+      </nav>
+      <span class="chip num" title="Taxminiy daraja">{{ user.profile.cefr }}</span>
+      {% elif user.is_authenticated and user.is_staff %}
+      <a class="btn btn-ghost btn-sm" href="{% url 'studio:dashboard' %}">Studio</a>
+      {% else %}
+      <div class="flex items-center gap-2">
+        <a class="btn btn-quiet btn-sm" href="{% url 'accounts:login' %}">Kirish</a>
+        <a class="btn btn-dark btn-sm" href="{% url 'accounts:register' %}">Boshlash</a>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+  {% endblock %}
+
+  {% if messages %}
+  <div class="shell-narrow mt-5 grid gap-2" role="status">
+    {% for message in messages %}<div class="flash flash-{{ message.tags }}">{{ message }}</div>{% endfor %}
+  </div>
+  {% endif %}
+
+  <main id="main">{% block content %}{% endblock %}</main>
+
+  {% block tabbar %}
+  {% if user.is_authenticated and not user.is_staff and user.profile.placement_done %}
+  <nav class="tabbar" aria-label="Asosiy">
+    <a class="tab" href="{% url 'learning:dashboard' %}" {% current '/dashboard/' '/learn/' %}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Bugun</a>
+    <a class="tab" href="{% url 'curriculum:map' %}" {% current '/curriculum/' %}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h10M4 18h13"/></svg>Dastur</a>
+    <a class="tab" href="{% url 'analytics:progress' %}" {% current '/progress/' %}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19V11M12 19V5M19 19v-6"/></svg>Natijalar</a>
+    <a class="tab" href="{% url 'accounts:settings' %}" {% current '/settings/' %}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.2 3.8-5 7-5s5.8 1.8 7 5"/></svg>Hisob</a>
+  </nav>
+  {% endif %}
+  {% endblock %}
+</body>
+</html>

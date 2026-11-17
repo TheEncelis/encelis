@@ -1,0 +1,86 @@
+{% extends "base.html" %}{% load ui %}
+{% block title %}{{ topic.title }} · encelis{% endblock %}
+{% block content %}
+<section class="shell page">
+  <a class="link text-sm" href="{% url 'curriculum:map' %}">← Dastur</a>
+  <div class="mt-5 grid gap-10 lg:grid-cols-[1fr_320px]">
+    <article>
+      <div class="flex flex-wrap items-center gap-2"><span class="level-badge">{{ topic.unit.level.code }}</span><span class="chip">{{ topic.unit.title }}</span></div>
+      <h1 class="display title-lg mt-4">{{ topic.title }}</h1>
+      <p class="en muted text-lg mt-1">{{ topic.title_en }}</p>
+      {% if topic.summary %}<p class="lede mt-5">{{ topic.summary }}</p>{% endif %}
+      {% if unmet %}
+      <div class="flash flash-info mt-6">
+        Bu mavzuni yaxshi tushunish uchun avval quyidagilarni o'rganish tavsiya etiladi:
+        {% for t in unmet %}<a class="link" href="{% url 'curriculum:topic' t.slug %}">{{ t.title }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}.
+      </div>
+      {% endif %}
+      {% if objectives %}
+      <div class="panel mt-8 p-5">
+        <p class="eyebrow mb-3">O'quv maqsadlari</p>
+        <ul class="grid gap-2 text-[0.95rem]">{% for o in objectives %}<li class="flex gap-3"><span style="color:var(--accent)">—</span>{{ o.text }}</li>{% endfor %}</ul>
+      </div>
+      {% endif %}
+      <div class="mt-10">{% include "curriculum/partials/blocks.html" %}</div>
+    </article>
+
+    <aside class="grid content-start gap-6 lg:sticky lg:top-24">
+      <div class="panel-raised p-6">
+        <p class="eyebrow">Sizning holatingiz</p>
+        {% if state and state.stage > 0 %}
+          <div class="mt-3 flex items-baseline justify-between"><span class="title-md">{{ state.stage|stage_label }}</span><span class="display text-2xl num">{{ state.percent }}%</span></div>
+          <div class="mt-3">{% stage_track state.stage %}</div>
+          <p class="help mt-2">{{ state.stage|stage_hint }}</p>
+          {% if state.is_weak %}<p class="chip chip-bad mt-3">{{ state.weak_reason|weak_label }}</p>{% endif %}
+          {% if state.assumed %}<p class="help mt-3">Daraja testi asosida belgilangan — takrorlashda tasdiqlanadi.</p>{% endif %}
+          <dl class="mt-5 grid grid-cols-2 gap-3 text-sm">
+            <div><dt class="help">Aniqlik</dt><dd class="num font-semibold">{{ state.recent_accuracy|percent }}%</dd></div>
+            <div><dt class="help">Ravonlik</dt><dd class="num font-semibold">{{ state.fluency|percent }}%</dd></div>
+            <div><dt class="help">Mashq turlari</dt><dd class="num font-semibold">{{ state.distinct_types }}</dd></div>
+            <div><dt class="help">Savollar</dt><dd class="num font-semibold">{{ state.distinct_questions }}</dd></div>
+          </dl>
+          {% if gaps %}
+          <div class="mt-5"><p class="help mb-1">O'zlashtirish uchun yana:</p>
+            <ul class="grid gap-1 text-sm">{% for g in gaps %}<li class="flex gap-2"><span style="color:var(--accent)">·</span>{{ g|gap_label }}</li>{% endfor %}</ul></div>
+          {% endif %}
+          {% if card %}<p class="help mt-4">Keyingi takrorlash: <strong style="color:var(--ink)">{{ card.due|until }}</strong></p>{% endif %}
+        {% else %}
+          <p class="mt-2 muted text-sm">Hali boshlanmagan.</p>
+        {% endif %}
+        <form method="post" action="{% url 'learning:start' %}" class="mt-6">{% csrf_token %}
+          <input type="hidden" name="kind" value="topic"><input type="hidden" name="topic" value="{{ topic.slug }}">
+          <button class="btn btn-primary btn-block">{% if state and state.stage > 1 %}Shu mavzuni mashq qilish{% else %}Mavzuni boshlash{% endif %}</button>
+        </form>
+      </div>
+
+      {% if mistakes %}
+      <div>
+        <p class="eyebrow mb-2">Sizning xatolaringiz</p>
+        {% for m in mistakes %}<div class="flex justify-between py-1.5 text-sm"><span>{{ m.get_error_tag_display }}</span><span class="num muted">{{ m.count }}</span></div>{% endfor %}
+      </div>
+      {% endif %}
+
+      {% if prerequisites %}
+      <div>
+        <p class="eyebrow mb-2">Asos mavzular</p>
+        {% for p in prerequisites %}
+        <a class="flex items-center justify-between py-1.5 text-sm" href="{% url 'curriculum:topic' p.topic.slug %}"><span class="link">{{ p.topic.title }}</span><span class="help">{% if p.state %}{{ p.state.stage|stage_label }}{% else %}—{% endif %}</span></a>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if dependents %}
+      <div>
+        <p class="eyebrow mb-2">Keyingi mavzular</p>
+        {% for d in dependents %}<a class="block py-1.5 text-sm link" href="{% url 'curriculum:topic' d.topic.slug %}">{{ d.topic.title }}</a>{% endfor %}
+      </div>
+      {% endif %}
+      {% if related %}
+      <div>
+        <p class="eyebrow mb-2">Bog'liq mavzular</p>
+        {% for r in related %}<a class="block py-1.5 text-sm link" href="{% url 'curriculum:topic' r.slug %}">{{ r.title }}</a>{% endfor %}
+      </div>
+      {% endif %}
+    </aside>
+  </div>
+</section>
+{% endblock %}

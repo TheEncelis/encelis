@@ -1,0 +1,9 @@
+{% load ui %}<nav class="grid gap-0.5" aria-label="Studio">
+  <a class="studio-link" href="{% url 'studio:dashboard' %}" {% if request.path == '/studio/' %}aria-current="page"{% endif %}>Umumiy ko'rinish</a>
+  <a class="studio-link" href="{% url 'studio:users' %}" {% current '/studio/learners/' %}>O'quvchilar</a>
+  <a class="studio-link" href="{% url 'studio:curriculum' %}" {% current '/studio/curriculum/' %}>Dastur va nazariya</a>
+  <a class="studio-link" href="{% url 'studio:questions' %}" {% current '/studio/questions/' %}>Savollar{% if studio_counts.pending_questions %}<span class="count">{{ studio_counts.pending_questions }}</span>{% endif %}</a>
+  <a class="studio-link" href="{% url 'studio:reports' %}" {% current '/studio/reports/' %}>Xabarlar{% if studio_counts.open_reports %}<span class="count">{{ studio_counts.open_reports }}</span>{% endif %}</a>
+  <a class="studio-link" href="{% url 'studio:ai' %}" {% current '/studio/ai/' %}>AI yordamchi</a>
+  <a class="studio-link" href="{% url 'studio:settings' %}" {% current '/studio/settings/' %}>Sozlamalar</a>
+</nav>
