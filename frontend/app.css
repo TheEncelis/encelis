@@ -124,7 +124,13 @@
   /* Always reserve the scrollbar's space, so the layout (and the centred header)
      does not jump sideways between pages that scroll and pages that don't. */
   html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
+  /* Grid and flex items default to min-width:auto, i.e. they can never be narrower
+     than their min-content. A single-line truncated title then stretches its column
+     past the screen and mobile browsers zoom the whole page out. Let items shrink so
+     .truncate can do its job. */
+  .grid > *, .topic-node > *, .srow > *, .row-link > * { min-width: 0; }
   body {
+    overflow-x: clip;
     background: var(--bg);
     color: var(--ink);
     font-family: var(--font-sans);
@@ -154,9 +160,11 @@
      the middle of its x-height (where the eye reads the centre of a lowercase
      word) meets the mark's centre. Measured in Inter 600: both land on the bar's
      centre line. */
-  .logo { font-family: "Inter", sans-serif; font-weight: 600; letter-spacing: -0.045em; font-size: 1.4rem; line-height: 1; color: var(--ink); display: inline-flex; align-items: center; gap: 0.36em; white-space: nowrap; }
+  .logo { font-family: "Inter", sans-serif; font-weight: 600; letter-spacing: -0.045em; font-size: 1.4rem; line-height: 1; color: var(--ink); display: inline-flex; align-items: center; gap: 0.33em; white-space: nowrap; }
   /* The mark is the anchor: centred in the bar with no offset. */
-  .logo-mark { width: 1.1em; height: 1.1em; flex: none; fill: currentColor; }
+  /* The viewBox keeps a ~3% margin around the glyph so no edge pixels are clipped on
+     high-DPI screens; 1.16em keeps the glyph itself the same visual size as before. */
+  .logo-mark { width: 1.16em; height: 1.16em; flex: none; fill: currentColor; overflow: visible; }
   /* The word is raised so the middle of its x-height meets the mark's centre. */
   .logo-word { position: relative; top: -0.03em; }
   .logo-tag { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-left: 0.6rem; }
@@ -240,9 +248,10 @@
   .meter > span { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--accent); transition: width .5s ease; }
   .meter-good > span { background: var(--good); }
   .meter-stack > span + span { background: var(--accent-line); }
-  .ring { --p: 0; --size: 112px; width: var(--size); height: var(--size); border-radius: 50%; background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--sand) 0); display: grid; place-items: center; }
-  .ring::before { content: ""; grid-area: 1/1; width: calc(var(--size) - 14px); height: calc(var(--size) - 14px); border-radius: 50%; background: var(--surface); }
-  .ring > * { grid-area: 1/1; position: relative; text-align: center; }
+  /* Not named .ring: Tailwind has a ring utility that would add a 1px outline. */
+  .goal-ring { --p: 0; --size: 112px; width: var(--size); height: var(--size); flex: none; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--sand) 0); display: grid; place-items: center; }
+  .goal-ring::before { content: ""; grid-area: 1/1; width: calc(var(--size) - 14px); height: calc(var(--size) - 14px); border-radius: 50%; background: var(--surface); }
+  .goal-ring > * { grid-area: 1/1; position: relative; text-align: center; }
 
   .stage-track { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
   .stage-track > i { height: 4px; border-radius: 2px; background: var(--sand); }
@@ -322,7 +331,7 @@
   .htmx-request.btn, .htmx-request .btn-submit { opacity: .6; pointer-events: none; }
 
   /* ---------- curriculum map ---------- */
-  .topic-node { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .topic-node { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
   .topic-node:last-child { border-bottom: 0; }
   .node-dot { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--line-strong); color: var(--faint); background: var(--surface); }
   .node-dot svg { width: 14px; height: 14px; }

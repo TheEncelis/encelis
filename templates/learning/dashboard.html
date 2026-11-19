@@ -47,7 +47,7 @@
 
     {# ---- Daily goal ---- #}
     <div class="panel p-6 flex items-center gap-6">
-      <div class="ring" style="--p:{{ goal_pct }}">
+      <div class="goal-ring" style="--p:{{ goal_pct }}" role="img" aria-label="Kunlik maqsad: {{ goal_pct }}%">
         <div><p class="display text-2xl num">{{ goal_minutes_done }}</p><p class="help">/ {{ profile.daily_goal_minutes }} daq</p></div>
       </div>
       <div class="grid gap-3">

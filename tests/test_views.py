@@ -2,7 +2,7 @@
 from django.core import mail
 from django.core.cache import cache
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.accounts.models import User
@@ -12,6 +12,8 @@ from apps.questions.models import Question, QuestionReport
 from . import factories as f
 
 
+# Email links are built from SITE_URL; pin it so the suite does not depend on the local .env.
+@override_settings(SITE_URL="http://localhost:8000")
 class FlowTests(TestCase):
     @classmethod
     def setUpTestData(cls):
