@@ -35,7 +35,8 @@
   <p class="help mt-2">Javobingiz grammatik va ma'no jihatdan baholanadi. Muqobil to'g'ri ifodalar qabul qilinadi.</p>
 
 {% else %}
-  {% if question.type == "translation" %}<p class="q-instruction">Ingliz tiliga tarjima qiling:</p>{% elif question.type == "error_correction" %}<p class="q-instruction">Xatoni toping va gapni to'g'ri yozing:</p>{% endif %}
+  {# Fallback wording only when the question has no instruction of its own (shown above). #}
+  {% if not question.instruction %}{% if question.type == "translation" %}<p class="q-instruction">Ingliz tiliga tarjima qiling:</p>{% elif question.type == "error_correction" %}<p class="q-instruction">Xatoni toping va gapni to'g'ri yozing:</p>{% endif %}{% endif %}
   <p class="q-prompt mt-1">{{ question.prompt }}</p>
   <input class="input en mt-5 !text-[1.08rem]" name="text" maxlength="600" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Javobingiz…" autofocus required>
 {% endif %}

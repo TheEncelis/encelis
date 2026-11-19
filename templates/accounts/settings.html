@@ -32,7 +32,7 @@
       <legend class="label mb-2">Mavzu</legend>
       <div class="grid grid-cols-3 gap-2">
         {% for value, label in form.theme.field.choices %}
-        <label class="option justify-center !font-sans !text-[0.92rem]" style="padding:12px 8px">
+        <label class="option justify-center text-center leading-snug !font-sans !text-[0.92rem]" style="padding:12px 8px">
           <input type="radio" name="theme" value="{{ value }}" @change="set('{{ value }}')" {% if form.theme.value == value %}checked{% endif %}>{{ label }}
         </label>
         {% endfor %}

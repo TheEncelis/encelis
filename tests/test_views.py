@@ -106,6 +106,20 @@ class FlowTests(TestCase):
         self.assertEqual(self.client.get(reverse("learning:session", args=[session.pk])).status_code, 404)
         self.assertEqual(self.client.post(reverse("questions:report", args=[Question.objects.first().pk]), {"reason": "other"}).status_code, 403)
 
+    def test_question_instruction_is_rendered_once(self):
+        from django.template.loader import render_to_string
+
+        for qtype in Question.objects.values_list("type", flat=True).distinct():
+            q = Question.objects.filter(type=qtype).first()
+            for instruction in (q.instruction, ""):
+                with self.subTest(type=qtype, own_instruction=bool(instruction)):
+                    q.instruction = instruction
+                    html = render_to_string("questions/partials/inputs.html", {"question": q, "prompt_parts": [], "tokens_json": "[]"})
+                    expected = 1 if instruction or qtype in ("translation", "error_correction") else 0
+                    if qtype == "construction":
+                        expected += 1  # the separate "Ma'nosi:" label
+                    self.assertEqual(html.count('class="q-instruction'), expected)
+
     def test_password_reset_link_ignores_host_header(self):
         f.learner(email="reset@example.com")
         self.client.post(reverse("accounts:password_reset"), {"email": "reset@example.com"}, HTTP_HOST="localhost")
